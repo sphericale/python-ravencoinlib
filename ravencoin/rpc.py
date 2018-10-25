@@ -12,6 +12,7 @@
 import os
 import platform
 import bitcoin.rpc
+from ravencoin.core import lx
 
 DEFAULT_HTTP_TIMEOUT = 30
 
@@ -77,13 +78,7 @@ class RavenProxy(bitcoin.rpc.Proxy):
         """Creates a unique asset from a pool of assets with a specific name.
         Example: If the asset name is SOFTLICENSE, then this could make unique assets like SOFTLICENSE:38293 and SOFTLICENSE:48382
         """
-        if ipfs_hashes is not None:
-           r = self._call('issueunique', root_name, asset_tags, ipfs_hashes)
-# bugged currently
-#           r = self._call('issueunique', root_name, asset_tags, ipfs_hashes, to_address, change_address)
-        else:
-#           r = self._call('issueunique', root_name, asset_tags, None, to_address, change_address)
-           r = self._call('issueunique', root_name, asset_tags)
+        r = self._call('issueunique', root_name, asset_tags, ipfs_hashes, to_address, change_address)
         txid = r[0]
         return lx(txid)
 

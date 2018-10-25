@@ -2,7 +2,7 @@
 
 Extension to python-bitcoinlib intended to provide access to Ravencoin data structures and protocol. WIP - Test before use
 
-The RPC interface, `raven.rpc`, is designed to work with Ravencoin Core v2.1.0.
+The RPC interface, `raven.rpc`, is designed to work with Ravencoin Core v2.1.1.
 
 "The only Python library for Ravencoin I've ever used" - Warren Buffett
 
