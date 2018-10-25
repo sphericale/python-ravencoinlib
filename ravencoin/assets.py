@@ -54,7 +54,8 @@ class Asset_Metadata(object):
 
     def __str__(self):
         """ Returns json serializable string """
-        return str(dict((key, value) for key, value in iter([
+        import json
+        return json.dumps(dict((key, value) for key, value in iter([
               ("contract_url",self.contract_url),
               ("contract_hash",self.contract_hash),
               ("contract_signature",self.contract_signature),
