@@ -9,6 +9,7 @@
 # propagated, or distributed except according to the terms contained in the
 # LICENSE file.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
 from bitcoin.wallet import *
 
 class CRavencoinAddress(CBitcoinAddress):

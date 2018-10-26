@@ -9,10 +9,12 @@
 # propagated, or distributed except according to the terms contained in the
 # LICENSE file.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import platform
 import bitcoin.rpc
 from ravencoin.core import lx
+
 
 DEFAULT_HTTP_TIMEOUT = 30
 
@@ -70,7 +72,7 @@ class RavenProxy(bitcoin.rpc.Proxy):
         Unit as 1 for whole units, or 0.00000001 for satoshi-like units.
         Qty should be whole number.
         Reissuable is true/false for whether additional units can be issued by the original issuer."""
-        r = self._call('issue', asset_name, float(qty), to_address, change_address, int(units), reissuable, has_ipfs, ipfs_hash)
+        r = self._call('issue', asset_name, float(qty), str(to_address), str(change_address), int(units), reissuable, has_ipfs, ipfs_hash)
         txid = r[0]
         return lx(txid)
 
@@ -78,7 +80,7 @@ class RavenProxy(bitcoin.rpc.Proxy):
         """Creates a unique asset from a pool of assets with a specific name.
         Example: If the asset name is SOFTLICENSE, then this could make unique assets like SOFTLICENSE:38293 and SOFTLICENSE:48382
         """
-        r = self._call('issueunique', root_name, asset_tags, ipfs_hashes, to_address, change_address)
+        r = self._call('issueunique', root_name, asset_tags, ipfs_hashes, str(to_address), str(change_address))
         txid = r[0]
         return lx(txid)
 
@@ -88,15 +90,15 @@ class RavenProxy(bitcoin.rpc.Proxy):
         qty = float(qty)
         new_unit = int(new_unit)
         if new_ipfs is not None:
-           r = self._call('reissue', reissue_asset_name, qty, to_address, change_address, reissuable, new_unit, new_ipfs)
+           r = self._call('reissue', reissue_asset_name, qty, str(to_address), str(change_address), reissuable, new_unit, new_ipfs)
         else:
-           r = self._call('reissue', reissue_asset_name, qty, to_address, change_address, reissuable, new_unit)
+           r = self._call('reissue', reissue_asset_name, qty, str(to_address), str(change_address), reissuable, new_unit)
         txid = r[0]
         return lx(txid)
 
     def transfer(self, asset_name, qty, to_address):
         """This sends assets from one asset holder to another"""
-        r = self._call('transfer', asset_name, float(qty), to_address)
+        r = self._call('transfer', asset_name, float(qty), str(to_address))
         txid = r[0]
         return lx(txid)
 
@@ -112,7 +114,7 @@ class RavenProxy(bitcoin.rpc.Proxy):
 
     def listassetbalancesbyaddress(self, address):
         """Lists asset balance by address"""
-        r = self._call('listassetbalancesbyaddress', address)
+        r = self._call('listassetbalancesbyaddress', str(address))
         return r
 
     def listaddressesbyasset(self, asset_name):
