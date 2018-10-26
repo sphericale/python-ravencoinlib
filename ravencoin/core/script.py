@@ -10,3 +10,8 @@
 # LICENSE file.
 
 from bitcoin.core.script import *
+
+OP_RVN_ASSET = CScriptOp(0xc0)
+
+OPCODE_NAMES.update({OP_RVN_ASSET: 'OP_RVN_ASSET'})
+OPCODES_BY_NAME.update({'OP_RVN_ASSET': OP_RVN_ASSET})
