@@ -6,9 +6,13 @@ The RPC interface, `raven.rpc`, is designed to work with Ravencoin Core v2.1.1.
 
 "The only Python library for Ravencoin I've ever used" - Warren Buffett
 
+# Requirements
+    libssl
+    Debian/Ubuntu: sudo apt-get install libssl-dev
+    Windows/other: https://wiki.openssl.org/index.php/Binaries 
+    
 # Installation
 
-    sudo apt-get install libssl-dev
     pipenv install -e git+https://github.com/petertodd/python-bitcoinlib.git#egg=python-bitcoinlib
     pipenv install -e git+https://github.com/standard-error/python-ravencoinlib.git#egg=python-ravencoinlib
 
