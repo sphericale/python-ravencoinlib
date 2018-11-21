@@ -2,7 +2,7 @@
 
 Extension to python-bitcoinlib intended to provide access to Ravencoin data structures and protocol. WIP - Test before use
 
-The RPC interface, `raven.rpc`, is designed to work with Ravencoin Core v2.1.1.
+The RPC interface, `raven.rpc`, is designed to work with Ravencoin Core v2.1.3.
 
 "The only Python library for Ravencoin I've ever used" - Warren Buffett
 
@@ -13,8 +13,7 @@ The RPC interface, `raven.rpc`, is designed to work with Ravencoin Core v2.1.1.
     
 # Installation
 
-    pipenv install -e git+https://github.com/petertodd/python-bitcoinlib.git#egg=python-bitcoinlib
-    pipenv install -e git+https://github.com/standard-error/python-ravencoinlib.git#egg=python-ravencoinlib
+    pip install python-ravencoinlib
 
 # Example Code
 
@@ -37,7 +36,6 @@ the Raven codebase.
 
 Under /tests using test data from Ravencoin Core. To run them:
 
-    python -m unittest discover && python3 -m unittest discover
+    python3 -m unittest discover
 
-Please run the tests on both Python2 and Python3 for your pull-reqs!
 
