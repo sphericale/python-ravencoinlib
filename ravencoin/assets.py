@@ -18,15 +18,15 @@ MAX_NAME_LENGTH = 30 # +1 for ownership
 
 sha_256_hash = re.compile("^[A-Fa-f0-9]{64}$") # regex matching a sha256 hash
 
-ROOT_NAME_CHARACTERS = re.compile("^[A-Z0-9._]{3,}$")
-SUB_NAME_CHARACTERS = re.compile("^[A-Z0-9._]+$")
-UNIQUE_TAG_CHARACTERS = re.compile("^[-A-Za-z0-9@$%&*()[\\]{}_.?:]+$")
-CHANNEL_TAG_CHARACTERS = re.compile("^[A-Z0-9._]+$")
-VOTE_TAG_CHARACTERS = re.compile("^[A-Z0-9._]+$")
+ROOT_NAME_CHARACTERS = re.compile(r"^[A-Z0-9._]{3,}$")
+SUB_NAME_CHARACTERS = re.compile(r"^[A-Z0-9._]+$")
+UNIQUE_TAG_CHARACTERS = re.compile(r"^[-A-Za-z0-9@$%&*()[\]{}_.?:]+$")
+CHANNEL_TAG_CHARACTERS = re.compile(r"^[A-Z0-9._]+$")
+VOTE_TAG_CHARACTERS = re.compile(r"^[A-Z0-9._]+$")
 
-DOUBLE_PUNCTUATION = re.compile("^.*[._]{2,}.*$")
-LEADING_PUNCTUATION = re.compile("^[._].*$")
-TRAILING_PUNCTUATION = re.compile("^.*[._]$")
+DOUBLE_PUNCTUATION = re.compile(r"^.*[._]{2,}.*$")
+LEADING_PUNCTUATION = re.compile(r"^[._].*$")
+TRAILING_PUNCTUATION = re.compile(r"^.*[._]$")
 
 RAVEN_NAMES = re.compile("^RVN$|^RAVEN$|^RAVENCOIN$")
 
@@ -87,11 +87,11 @@ class CAsset(object):
         if TRAILING_PUNCTUATION.match(namestr):
             raise InvalidAssetName("trailing punctuation")
         if isinstance(self,CMainAsset) and not ROOT_NAME_CHARACTERS.match(namestr):
-            raise InvalidAssetName("\nInvalid characters in asset name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only)".format(namestr))
+            raise InvalidAssetName("\nInvalid characters in asset name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only, min length 3)".format(namestr))
         elif isinstance(self,CSubAsset) and not SUB_NAME_CHARACTERS.match(namestr):
-            raise InvalidAssetName("Invalid characters in asset name")
+            raise InvalidAssetName("\nInvalid characters in asset name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only".format(namestr))
         elif isinstance(self,CUniqueAsset) and not UNIQUE_TAG_CHARACTERS.match(namestr):
-            raise InvalidAssetName("Invalid characters in asset name")
+            raise InvalidAssetName("\nInvalid characters in asset name {}\n".format(namestr) + "'A-Z', 'a-z', '0-9' '-@$%&*()[]{}_.?:' allowed")
             
         max_length = MAX_NAME_LENGTH
         if self.ownership:
@@ -100,8 +100,9 @@ class CAsset(object):
             max_length+=1
             
         self._name = namestr
-               
-        if len(self.full_name) > max_length:            
+        
+        # unique tag '#' is not counted when checking length, as raven source       
+        if len(self.full_name.replace('#', '')) > max_length:            
             raise InvalidAssetName("Asset string {} is too long (max {} characters)".format(self.full_name,max_length))
                               
     
