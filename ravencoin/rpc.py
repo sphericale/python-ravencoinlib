@@ -18,15 +18,19 @@ from ravencoin.core import lx
 
 DEFAULT_HTTP_TIMEOUT = 30
 
-def get_rvn_conf():
-   if platform.system() == 'Darwin':
-      rvn_conf_file = os.path.expanduser('~/Library/Application Support/Raven/')
-   elif platform.system() == 'Windows':
-      rvn_conf_file = os.path.join(os.environ['APPDATA'], 'Raven')
-   else:
-      rvn_conf_file = os.path.expanduser('~/.raven')
-   rvn_conf_file = os.path.join(rvn_conf_file, 'raven.conf')
-   return rvn_conf_file
+def get_rvn_datadir(datadir=None):
+    if datadir is None:
+      if platform.system() == 'Darwin':
+          datadir = os.path.expanduser('~/Library/Application Support/Raven/')
+      elif platform.system() == 'Windows':
+          datadir = os.path.join(os.environ['APPDATA'], 'Raven')
+      else:
+          datadir = os.path.expanduser('~/.raven')
+          
+    return datadir
+
+def get_rvn_conf(datadir=None):
+   return os.path.join(get_rvn_datadir(datadir), 'raven.conf')
 
 
 class RavenRawProxy(bitcoin.rpc.RawProxy):
@@ -35,17 +39,17 @@ class RavenRawProxy(bitcoin.rpc.RawProxy):
                  service_port=None,
                  rvn_conf_file=None,
                  timeout=DEFAULT_HTTP_TIMEOUT,
+                 datadir=None,
                  **kwargs):
 
         if service_url is None:
             if rvn_conf_file is None:
-                rvn_conf_file = get_rvn_conf()
+                rvn_conf_file = get_rvn_conf(datadir)
 
         super(RavenRawProxy, self).__init__(service_url=service_url,
                                        service_port=service_port,
                                        btc_conf_file=rvn_conf_file,
-                                       timeout=timeout,
-                                       **kwargs)
+                                       timeout=timeout)
 
 class RavenProxy(bitcoin.rpc.Proxy):
     def __init__(self,
@@ -53,17 +57,17 @@ class RavenProxy(bitcoin.rpc.Proxy):
                  service_port=None,
                  rvn_conf_file=None,
                  timeout=DEFAULT_HTTP_TIMEOUT,
+                 datadir=None,
                  **kwargs):
 
         if service_url is None:
             if rvn_conf_file is None:
-                rvn_conf_file = get_rvn_conf()
+                rvn_conf_file = get_rvn_conf(datadir)
 
         super(RavenProxy, self).__init__(service_url=service_url,
                                     service_port=service_port,
                                     btc_conf_file=rvn_conf_file,
-                                    timeout=timeout,
-                                    **kwargs)
+                                    timeout=timeout)
 
     """ Raven asset support """
 
