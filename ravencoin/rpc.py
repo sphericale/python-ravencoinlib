@@ -107,6 +107,8 @@ class RavenProxy(bitcoin.rpc.Proxy):
 
     def transfer(self, asset_name, qty, to_address):
         """This sends assets from one asset holder to another"""
+        if not re.match('^[0-9\.]+$', str(qty)):
+           raise(ValueError("qty '{}' is not numeric".format(qty)))
         r = self._call('transfer', str(asset_name), qty, str(to_address))
         txid = r[0]
         return lx(txid)
