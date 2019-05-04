@@ -2,7 +2,7 @@
 
 Extension to python-bitcoinlib intended to provide access to Ravencoin data structures and protocol. WIP - Test before use
 
-The RPC interface, `ravencoin.rpc`, is designed to work with Ravencoin Core v2.1.3.
+The RPC interface, `ravencoin.rpc`, is designed to work with Ravencoin Core v2.2.2.
 
 "The only Python library for Ravencoin I've ever used" - Warren Buffett
 
@@ -43,8 +43,10 @@ the Raven codebase.
     # Ravencoin wallet/daemon must be running with rpc server enabled
     # RavenProxy created without arguments will use values from local raven.conf
     from ravencoin.rpc import RavenProxy
-    rvn = RavenProxy() 
-    rvn.issue(asset_name)
+    rvn = RavenProxy()
+    asset_name = "TEST"
+    qty=1
+    rvn.issue(asset_name,qty)
         
     
 
