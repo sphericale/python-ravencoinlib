@@ -12,6 +12,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import platform
+import re
 import bitcoin.rpc
 from ravencoin.core import lx
 
@@ -76,7 +77,9 @@ class RavenProxy(bitcoin.rpc.Proxy):
         Unit as 0 for whole units, or 8 for satoshi-like units (0.00000001).
         Qty should be whole number.
         Reissuable is true/false for whether additional units can be issued by the original issuer."""
-        r = self._call('issue', str(asset_name), float(qty), str(to_address), str(change_address), int(units), reissuable, has_ipfs, ipfs_hash)
+        if not re.match('^[0-9\.]+$', str(qty)):
+           raise(ValueError("qty '{}' is not numeric".format(qty)))
+        r = self._call('issue', str(asset_name), qty, str(to_address), str(change_address), int(units), reissuable, has_ipfs, ipfs_hash)
         txid = r[0]
         return lx(txid)
 
@@ -92,8 +95,9 @@ class RavenProxy(bitcoin.rpc.Proxy):
     def reissue(self, reissue_asset_name, qty, to_address, change_address="", reissuable=True, new_unit=-1, new_ipfs=None):
         """Issue more of a specific asset. This is only allowed by the original issuer of the asset
         and if the reissuable flag was set to true at the time of original issuance."""
-        qty = float(qty)
         new_unit = int(new_unit)
+        if not re.match('^[0-9\.]+$', str(qty)):
+           raise(ValueError("qty '{}' is not numeric".format(qty)))
         if new_ipfs is not None:
            r = self._call('reissue', str(reissue_asset_name), qty, str(to_address), str(change_address), reissuable, new_unit, new_ipfs)
         else:
@@ -103,7 +107,7 @@ class RavenProxy(bitcoin.rpc.Proxy):
 
     def transfer(self, asset_name, qty, to_address):
         """This sends assets from one asset holder to another"""
-        r = self._call('transfer', str(asset_name), float(qty), str(to_address))
+        r = self._call('transfer', str(asset_name), qty, str(to_address))
         txid = r[0]
         return lx(txid)
 
