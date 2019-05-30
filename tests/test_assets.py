@@ -68,10 +68,17 @@ class Test_AssetNames(unittest.TestCase):
         main_asset = CMainAsset("VALID.NAME")
         sub_asset = CSubAsset("1",parent=main_asset)
         self.assertTrue(str(sub_asset) == "VALID.NAME/1")
+        sub2_asset = CSubAsset("2",parent=sub_asset)
+        # nested sub asset
+        self.assertTrue(str(sub2_asset) == "VALID.NAME/1/2")
 
         uniq_asset = CUniqueAsset("TEST",parent=sub_asset)
         self.assertTrue(uniq_asset.full_name == "VALID.NAME/1#TEST")
         self.assertTrue(str(uniq_asset) == "TEST")
+        
+        uniq2_asset = CUniqueAsset("TEST",parent=sub2_asset)
+        self.assertTrue(uniq2_asset.full_name == "VALID.NAME/1/2#TEST")
+        self.assertTrue(str(uniq2_asset) == "TEST")
 
         
     def test_ownership_tokens(self):

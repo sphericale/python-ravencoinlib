@@ -53,7 +53,7 @@ class CAsset(object):
         if isinstance(self,CMainAsset):
             return self._name
         elif isinstance(self,CSubAsset):
-            return self.parent.name + '/' + self._name
+            return self.parent.full_name + '/' + self._name
         elif isinstance(self,CUniqueAsset):
             return self.parent.full_name + '#' + self._name
             
@@ -115,10 +115,10 @@ class CSubAsset(CAsset):
     def __init__(self,name,parent=None,ownership=False):
         if parent == None:
             raise InvalidAssetType("CSubAsset parent not provided")
-        if isinstance(parent, CMainAsset):
+        if isinstance(parent, CMainAsset) or isinstance(parent, CSubAsset):
             super(CSubAsset, self).__init__(name,parent=parent,ownership=ownership)
         else:
-            raise InvalidAssetType("CSubAsset requires parent of type CMainAsset")
+            raise InvalidAssetType("CSubAsset requires parent of type CMainAsset or CSubAsset")
         
 class CUniqueAsset(CAsset):
     def __init__(self,name,parent=None):
