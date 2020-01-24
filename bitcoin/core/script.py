@@ -251,6 +251,8 @@ OP_PUBKEY = CScriptOp(0xfe)
 
 OP_INVALIDOPCODE = CScriptOp(0xff)
 
+OP_RVN_ASSET = CScriptOp(0xc0)
+
 OPCODE_NAMES.update({
     OP_0: 'OP_0',
     OP_PUSHDATA1: 'OP_PUSHDATA1',
@@ -369,6 +371,7 @@ OPCODE_NAMES.update({
     OP_PUBKEYHASH: 'OP_PUBKEYHASH',
     OP_PUBKEY: 'OP_PUBKEY',
     OP_INVALIDOPCODE: 'OP_INVALIDOPCODE',
+    OP_RVN_ASSET: 'OP_RVN_ASSET',
 })
 
 OPCODES_BY_NAME = {
@@ -488,6 +491,7 @@ OPCODES_BY_NAME = {
     'OP_PUBKEYS': OP_PUBKEYS,
     'OP_PUBKEYHASH': OP_PUBKEYHASH,
     'OP_PUBKEY': OP_PUBKEY,
+    'OP_RVN_ASSET': OP_RVN_ASSET
 }
 
 # Invalid even when occuring in an unexecuted OP_IF branch due to either being
