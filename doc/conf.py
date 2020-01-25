@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# bitcoin documentation build configuration file, created by
+# ravencoin documentation build configuration file, created by
 # sphinx-quickstart on Thu May 28 20:40:55 2015.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -11,9 +11,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-PROJECT = 'python-bitcoinlib'
-DESCRIPTION = 'The Swiss Army Knife of the Bitcoin protocol.'
-AUTHORS = 'The python-bitcoinlib developers'
+PROJECT = 'python-ravencoinlib'
+DESCRIPTION = 'The Swiss Army Knife of the Ravencoin protocol.'
+AUTHORS = 'The python-ravencoinlib developers'
 
 import sphinx
 import sys
@@ -24,7 +24,7 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 
-from bitcoin import __version__
+from ravencoin import __version__
 
 # Prevent loading openssl when generating API docs. Either the whole library or
 # the necessary elliptic curve might not be available, causing import to fail.
