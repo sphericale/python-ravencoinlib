@@ -1,19 +1,17 @@
 # python-ravencoinlib
 
-This Python3 library provides an easy interface to the ravencoin data
-structures and protocol. The approach is low-level and "ground up", with a
-focus on providing tools to manipulate the internals of how Ravencoin works.
+Ravencoin fork of python-bitcoinlib intended to provide access to Ravencoin data 
+structures and protocol. WIP - Test before use
 
-"The Swiss Army Knife of the Ravencoin protocol." - Wladimir J. van der Laan
+The RPC interface, ravencoin.rpc, is designed to work with Ravencoin Core v3.3.0+.
 
+"The only Python library for Ravencoin I've ever used" - Warren Buffett
 
 ## Requirements
 
-    sudo apt-get install libssl-dev
-
-The RPC interface, `ravencoin.rpc`, is designed to work with Ravencoin Core v0.16.0.
-Older versions may work but there do exist some incompatibilities.
-
+    libssl
+    Debian/Ubuntu: sudo apt-get install libssl-dev
+    Windows/other: https://wiki.openssl.org/index.php/Binaries 
 
 ## Structure
 
