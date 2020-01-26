@@ -5,6 +5,7 @@
 New fork from python-bitcoinlib v0.10.2
 
 * RPC - Support RVN messaging and restricted assets
+* X16R(V2) support
 
 ## v0.1.4 - May 2019
 

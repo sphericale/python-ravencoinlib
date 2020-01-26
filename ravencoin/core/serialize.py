@@ -17,6 +17,8 @@ You probabably don't need to use these directly.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import hashlib
+import x16r_hash
+import x16rv2_hash
 import struct
 
 # Py3 compatibility
@@ -33,6 +35,12 @@ else:
 
 MAX_SIZE = 0x02000000
 
+
+def X16RHash(msg):
+    return x16r_hash.getPoWHash(msg)
+
+def X16RV2Hash(msg):
+    return x16rv2_hash.getPoWHash(msg)
 
 def Hash(msg):
     """SHA256^2)(msg) -> bytes"""
@@ -359,6 +367,8 @@ def uint256_to_shortstr(u):
 __all__ = (
         'MAX_SIZE',
         'Hash',
+        'X16RHash',
+        'X16RV2Hash',
         'Hash160',
         'SerializationError',
         'SerializationTruncationError',
