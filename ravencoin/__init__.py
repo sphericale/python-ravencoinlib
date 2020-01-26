@@ -1,4 +1,5 @@
 # Copyright (C) 2012-2018 The python-bitcoinlib developers
+# Copyright (C) 2018-2020 The python-ravencoinlib developers
 #
 # This file is part of python-ravencoinlib.
 #
@@ -19,42 +20,36 @@ import ravencoin.core
 __version__ = '0.2.0dev'
 
 class MainParams(ravencoin.core.CoreMainParams):
-    MESSAGE_START = b'\xf9\xbe\xb4\xd9'
-    DEFAULT_PORT = 8333
-    RPC_PORT = 8332
-    DNS_SEEDS = (('ravencoin.sipa.be', 'seed.ravencoin.sipa.be'),
-                 ('bluematt.me', 'dnsseed.bluematt.me'),
-                 ('dashjr.org', 'dnsseed.ravencoin.dashjr.org'),
-                 ('ravencoinstats.com', 'seed.ravencoinstats.com'),
-                 ('xf2.org', 'bitseed.xf2.org'),
-                 ('ravencoin.jonasschnelli.ch', 'seed.ravencoin.jonasschnelli.ch'))
-    BASE58_PREFIXES = {'PUBKEY_ADDR':0,
-                       'SCRIPT_ADDR':5,
+    MESSAGE_START = b'\x52\x41\x56\x4e'
+    DEFAULT_PORT = 8767
+    RPC_PORT = 8766
+    DNS_SEEDS = (('seed-raven.bitactivate.com', 'seed-raven.ravencoin.com'),
+                 ('seed-raven.ravencoin.org', ''))
+    BASE58_PREFIXES = {'PUBKEY_ADDR':60,
+                       'SCRIPT_ADDR':122,
                        'SECRET_KEY' :128}
-    BECH32_HRP = 'bc'
+    BECH32_HRP = ''
 
 class TestNetParams(ravencoin.core.CoreTestNetParams):
-    MESSAGE_START = b'\x0b\x11\x09\x07'
-    DEFAULT_PORT = 18333
-    RPC_PORT = 18332
-    DNS_SEEDS = (('testnetravencoin.jonasschnelli.ch', 'testnet-seed.ravencoin.jonasschnelli.ch'),
-                 ('petertodd.org', 'seed.tbtc.petertodd.org'),
-                 ('bluematt.me', 'testnet-seed.bluematt.me'),
-                 ('ravencoin.schildbach.de', 'testnet-seed.ravencoin.schildbach.de'))
+    MESSAGE_START = b'\x52\x56\x4e\x54'
+    DEFAULT_PORT = 18770
+    RPC_PORT = 18766
+    DNS_SEEDS = (('seed-testnet-raven.bitactivate.com', 'seed-testnet-raven.ravencoin.com'),
+                 ('seed-testnet-raven.ravencoin.org', ''))
     BASE58_PREFIXES = {'PUBKEY_ADDR':111,
                        'SCRIPT_ADDR':196,
                        'SECRET_KEY' :239}
-    BECH32_HRP = 'tb'
+    BECH32_HRP = ''
 
 class RegTestParams(ravencoin.core.CoreRegTestParams):
-    MESSAGE_START = b'\xfa\xbf\xb5\xda'
+    MESSAGE_START = b'\x43\x52\x4f\x57'
     DEFAULT_PORT = 18444
     RPC_PORT = 18443
     DNS_SEEDS = ()
     BASE58_PREFIXES = {'PUBKEY_ADDR':111,
                        'SCRIPT_ADDR':196,
                        'SECRET_KEY' :239}
-    BECH32_HRP = 'bcrt'
+    BECH32_HRP = ''
 
 """Master global setting for what chain params we're using.
 

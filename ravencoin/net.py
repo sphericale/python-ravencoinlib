@@ -1,4 +1,5 @@
 # Copyright (C) 2012-2014 The python-bitcoinlib developers
+# Copyright (C) 2018-2020 The python-ravencoinlib developers
 #
 # This file is part of python-ravencoinlib.
 #
@@ -23,7 +24,7 @@ from ravencoin.core.serialize import (
 )
 from ravencoin.core import b2lx
 
-PROTO_VERSION = 60002
+PROTO_VERSION = 70026
 CADDR_TIME_VERSION = 31402
 IPV4_COMPAT = b"\x00" * 10 + b"\xff" * 2
 

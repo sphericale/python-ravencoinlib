@@ -1,4 +1,5 @@
 # Copyright (C) 2013-2015 The python-bitcoinlib developers
+# Copyright (C) 2018-2020 The python-ravencoinlib developers
 #
 # This file is part of python-ravencoinlib.
 #
@@ -48,7 +49,7 @@ def SignMessage(key, message):
 class RavencoinMessage(ImmutableSerializable):
     __slots__ = ['magic', 'message']
 
-    def __init__(self, message="", magic="Ravencoin Signed Message:\n"):
+    def __init__(self, message="", magic="Raven Signed Message:\n"):
         object.__setattr__(self, 'message', message.encode("utf-8"))
         object.__setattr__(self, 'magic', magic.encode("utf-8"))
 
