@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 The python-ravencoinlib developers
+# Copyright (C) 2013-2015 The python-bitcoinlib developers
 #
 # This file is part of python-ravencoinlib.
 #
