@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 The python-ravencoinlib developers
+# Copyright (C) 2013-2015 The python-bitcoinlib developers
 #
 # This file is part of python-ravencoinlib.
 #
@@ -33,9 +33,9 @@ def load_test_vectors(name):
 
 class Test_SignVerifyMessage(unittest.TestCase):
     def test_verify_message_simple(self):
-        address = "1F26pNMrywyZJdr22jErtKcjF8R3Ttt55G"
+        address = "RE34JR9zKhCLu4R7JFaDJz8JnypJDmCE14"
         message = address
-        signature = "H85WKpqtNZDrajOnYDgUY+abh0KCAcOsAIOQwx2PftAbLEPRA7mzXA/CjXRxzz0MC225pR/hx02Vf2Ag2x33kU4="
+        signature = "IKUeo59jk2ueeSBDkugZ9PBbteNayMn2FOKAQ1/WvoNzKcd0DeB1ljzTASm2VV8BeP//jF0aU7ztE55LIVVyOr8="
 
         message = RavencoinMessage(message)
 
@@ -47,8 +47,8 @@ class Test_SignVerifyMessage(unittest.TestCase):
             self.assertTrue(VerifyMessage(vector['address'], message, vector['signature']))
 
     def test_sign_message_simple(self):
-        key = CRavencoinSecret("L4vB5fomsK8L95wQ7GFzvErYGht49JsCPJyJMHpB4xGM6xgi2jvG")
-        address = "1F26pNMrywyZJdr22jErtKcjF8R3Ttt55G"
+        key = CRavencoinSecret("L1gVQSmAJDnkK1A1V3mJehL9xQbdai9CCx65d29seRFGVVheyngq")
+        address = "RL5dKQv7ZZYrqSYXNVgy2HvncjcQf8G6at"
         message = address
 
         message = RavencoinMessage(message)

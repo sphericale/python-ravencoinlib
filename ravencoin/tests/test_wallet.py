@@ -32,21 +32,21 @@ class Test_CRavencoinAddress(unittest.TestCase):
             elif isinstance(addr, CBech32RavencoinAddress):
                 self.assertEqual(addr.witver, expected_version)
 
-        T('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
-          x('62e907b15cbf27d5425399ebf6f0fb50ebb88f18'), 0,
+        T('RKq6ypcHZP7MzR67cRNgy9N9hm9B7ToZqY',
+          x('0277835ff3d899a90d22d297284ad85820d20e63e2155fb543bc9ba4b5832641c1'), 0,
           P2PKHRavencoinAddress)
 
         T('37k7toV1Nv4DfmQbmZ8KuZDQCYK9x5KpzP',
           x('4266fc6f2c2861d7fe229b279a79803afca7ba34'), 5,
           P2SHRavencoinAddress)
 
-        T('BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4',
-          x('751e76e8199196d454941c45d1b3a323f1433bd6'), 0,
-          P2WPKHRavencoinAddress)
+#        T('BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4',
+#          x('751e76e8199196d454941c45d1b3a323f1433bd6'), 0,
+#          P2WPKHRavencoinAddress)
 
-        T('bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9',
-          x('c7a1f1a4d6b4c1802a59631966a18359de779e8a6a65973735a3ccdfdabc407d'), 0,
-          P2WSHRavencoinAddress)
+#        T('bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9',
+#          x('c7a1f1a4d6b4c1802a59631966a18359de779e8a6a65973735a3ccdfdabc407d'), 0,
+#          P2WSHRavencoinAddress)
 
     def test_wrong_nVersion(self):
         """Creating a CRavencoinAddress from a unknown nVersion fails"""
@@ -210,15 +210,15 @@ class Test_P2PKHRavencoinAddress(unittest.TestCase):
             addr = P2PKHRavencoinAddress.from_pubkey(pubkey)
             self.assertEqual(str(addr), expected_str_addr)
 
-        T(x('0378d430274f8c5ec1321338151e9f27f4c676a008bdf8638d07c0b6be9ab35c71'),
-          '1C7zdTfnkzmr13HfA2vNm5SJYRK6nEKyq8')
-        T(x('0478d430274f8c5ec1321338151e9f27f4c676a008bdf8638d07c0b6be9ab35c71a1518063243acd4dfe96b66e3f2ec8013c8e072cd09b3834a19f81f659cc3455'),
-          '1JwSSubhmg6iPtRjtyqhUYYH7bZg3Lfy1T')
+        T(x('03d9e529a03f92beba94c85dd869f94388c19c6d7b7c055b3202fee0f70fbfd835'),
+          'RL5dKQv7ZZYrqSYXNVgy2HvncjcQf8G6at')
+        T(x('03172ea8a57b4c85a2721317d6f99f2d0bfbd624b2faaf465afde6fb7f8bc6a38a'),
+          'RRHzVuPMUe3r9EhRWUusx5sBKn29SJ93UC')
 
-        T(CPubKey(x('0378d430274f8c5ec1321338151e9f27f4c676a008bdf8638d07c0b6be9ab35c71')),
-          '1C7zdTfnkzmr13HfA2vNm5SJYRK6nEKyq8')
-        T(CPubKey(x('0478d430274f8c5ec1321338151e9f27f4c676a008bdf8638d07c0b6be9ab35c71a1518063243acd4dfe96b66e3f2ec8013c8e072cd09b3834a19f81f659cc3455')),
-          '1JwSSubhmg6iPtRjtyqhUYYH7bZg3Lfy1T')
+        T(CPubKey(x('029ef231f0606dc7b9b4c7af16d0f4a9645b62564f6f167d1f053964b7efff6466')),
+          'RBmjeJotJSH4mTJpiSj6eQK2kjDEhbRDBm')
+        T(CPubKey(x('02b1f5646f25ecda92bcbd0bf819e1f97b2a61ebad9adfade85cec8bcdc00a2fbf')),
+          'RLtrHG4X4BbipE4QkqnS16A5uLQt9dxqxp')
 
     def test_from_invalid_pubkeys(self):
         """Create P2PKHRavencoinAddress's from invalid pubkeys"""

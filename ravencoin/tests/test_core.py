@@ -37,8 +37,8 @@ class Test_Money(unittest.TestCase):
         self.assertFalse(MoneyRange(-1))
         self.assertTrue(MoneyRange(0))
         self.assertTrue(MoneyRange(100000))
-        self.assertTrue(MoneyRange(21000000 * COIN)) # Maximum money on Ravencoin network
-        self.assertFalse(MoneyRange(21000001 * COIN))
+        self.assertTrue(MoneyRange(21000000 * 1000 * COIN)) # Maximum money on Ravencoin network
+        self.assertFalse(MoneyRange(21000001 * 1000 * COIN))
 
     def test_MoneyRangeCustomParams(self):
         highMaxParamsType = type(str('CoreHighMainParams'), (CoreMainParams,object), {'MAX_MONEY': 22000000 * COIN })
@@ -49,27 +49,27 @@ class Test_Money(unittest.TestCase):
 
 class Test_CBlockHeader(unittest.TestCase):
     def test_serialization(self):
-        genesis = CBlockHeader(nVersion=1,
+        genesis = CBlockHeader(nVersion=4,
                 hashPrevBlock=lx('0000000000000000000000000000000000000000000000000000000000000000'),
-                hashMerkleRoot=lx('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'),
-                nTime=1231006505,
-                nBits=486604799,
-                nNonce=2083236893)
+                hashMerkleRoot=lx('28ff00a867739a352523808d301f504bc4547699398d70faf2266a8bae5f3516'),
+                nTime=1514999494,
+                nBits=0x1e00ffff,
+                nNonce=25023712)
         serialized = genesis.serialize()
         self.assertEqual(Hash(serialized),
-                      lx('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f'))
+                      lx('0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90'))
 
         genesis2 = CBlockHeader.deserialize(serialized)
         self.assertEqual(genesis, genesis2)
 
     def test_GetHash(self):
-        genesis = CBlockHeader(nVersion=1,
+        genesis = CBlockHeader(nVersion=4,
                 hashPrevBlock=lx('0000000000000000000000000000000000000000000000000000000000000000'),
-                hashMerkleRoot=lx('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'),
-                nTime=1231006505,
-                nBits=486604799,
-                nNonce=2083236893)
-        self.assertEqual(genesis.GetHash(), lx('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f'))
+                hashMerkleRoot=lx('28ff00a867739a352523808d301f504bc4547699398d70faf2266a8bae5f3516'),
+                nTime=1514999494,
+                nBits=0x1e00ffff,
+                nNonce=25023712)
+        self.assertEqual(genesis.GetHash(), lx('0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90'))
 
     def test_calc_difficulty(self):
         def T(nbits, expected):
@@ -86,7 +86,7 @@ class Test_CBlockHeader(unittest.TestCase):
 
 class Test_CBlock(unittest.TestCase):
     def test_serialization(self):
-        initial_serialized = x('0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c0101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000')
+        initial_serialized = x('04000000000000000000000000000000000000000000000000000000000000000000000016355fae8b6a26f2fa708d39997654c44b501f308d802325359a7367a800ff28c60e4d5affff001ee0d47d010101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff570004ffff001d01044c4d5468652054696d65732030332f4a616e2f3230313820426974636f696e206973206e616d65206f66207468652067616d6520666f72206e65772067656e65726174696f6e206f66206669726d73ffffffff010088526a74000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000')
         genesis = CBlock.deserialize(initial_serialized)
         serialized = genesis.serialize()
         self.assertEqual(Hash(serialized[0:80]),
@@ -94,8 +94,8 @@ class Test_CBlock(unittest.TestCase):
         self.assertEqual(serialized, initial_serialized)
 
     def test_GetHash(self):
-        genesis = CBlock.deserialize(x('0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c0101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000'))
-        self.assertEqual(genesis.GetHash(), lx('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f'))
+        genesis = CBlock.deserialize(x('04000000000000000000000000000000000000000000000000000000000000000000000016355fae8b6a26f2fa708d39997654c44b501f308d802325359a7367a800ff28c60e4d5affff001ee0d47d010101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff570004ffff001d01044c4d5468652054696d65732030332f4a616e2f3230313820426974636f696e206973206e616d65206f66207468652067616d6520666f72206e65772067656e65726174696f6e206f66206669726d73ffffffff010088526a74000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000'))
+        self.assertEqual(genesis.GetHash(), lx('0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90'))
 
     def test_calc_merkle_root_of_empty_block(self):
         """CBlock.calc_merkle_root() fails if vtx empty"""
