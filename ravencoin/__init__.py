@@ -14,10 +14,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import ravencoin.core
 
-# Note that setup.py can break if __init__.py imports any external
-# dependencies, as these might not be installed when setup.py runs. In this
-# case __version__ could be moved to a separate version.py and imported here.
-__version__ = '0.2.0dev'
+from version import __version__
+
 
 class MainParams(ravencoin.core.CoreMainParams):
     MESSAGE_START = b'\x52\x41\x56\x4e'

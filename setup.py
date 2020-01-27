@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 import os
 
-from ravencoin import __version__
+from version import __version__
 
 here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'README.md')) as f:
