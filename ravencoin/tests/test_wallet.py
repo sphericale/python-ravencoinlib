@@ -32,12 +32,12 @@ class Test_CRavencoinAddress(unittest.TestCase):
             elif isinstance(addr, CBech32RavencoinAddress):
                 self.assertEqual(addr.witver, expected_version)
 
-        T('RKq6ypcHZP7MzR67cRNgy9N9hm9B7ToZqY',
-          x('0277835ff3d899a90d22d297284ad85820d20e63e2155fb543bc9ba4b5832641c1'), 0,
+        T('RXCTT97MGsrguKrtcF7ewXBewdGrx8o1Hg',
+          x('f06d8520dbc8719c46e9b771a1233fcd74e69b2c'), 60,
           P2PKHRavencoinAddress)
 
-        T('37k7toV1Nv4DfmQbmZ8KuZDQCYK9x5KpzP',
-          x('4266fc6f2c2861d7fe229b279a79803afca7ba34'), 5,
+        T('rMbLFthAWRC6tgR38UEBWXogkizPkGUKhS',
+          x('a87635e97fb76177a3a086efacd841a271b7e8d5'), 122,
           P2SHRavencoinAddress)
 
 #        T('BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4',
@@ -65,16 +65,16 @@ class Test_CRavencoinAddress(unittest.TestCase):
             self.assertEqual(str(addr), expected_str_address)
             self.assertEqual(addr.__class__, expected_class)
 
-        T('a914000000000000000000000000000000000000000087', '31h1vYVSYuKP6AhS86fbRdMw9XHieotbST',
+        T('a914000000000000000000000000000000000000000087', 'r6Eb8FN9d1Xtmt1ZzBdtAJCynYS5jpWCRq',
           P2SHRavencoinAddress)
-        T('76a914000000000000000000000000000000000000000088ac', '1111111111111111111114oLvT2',
+        T('76a914000000000000000000000000000000000000000088ac', 'R9HC5WtHbpoa51NCUAz86XLCmGTbkf45NT',
           P2PKHRavencoinAddress)
-        T('0014751e76e8199196d454941c45d1b3a323f1433bd6',
-          'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
-          P2WPKHRavencoinAddress)
-        T('0020c7a1f1a4d6b4c1802a59631966a18359de779e8a6a65973735a3ccdfdabc407d',
-          'bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9',
-          P2WSHRavencoinAddress)
+#        T('0014751e76e8199196d454941c45d1b3a323f1433bd6',
+#          'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
+#          P2WPKHRavencoinAddress)
+#        T('0020c7a1f1a4d6b4c1802a59631966a18359de779e8a6a65973735a3ccdfdabc407d',
+#          'bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9',
+#          P2WSHRavencoinAddress)
 
     def test_from_nonstd_scriptPubKey(self):
         """CRavencoinAddress.from_scriptPubKey() with non-standard scriptPubKeys"""
@@ -126,14 +126,14 @@ class Test_CRavencoinAddress(unittest.TestCase):
             self.assertEqual(b2x(actual_scriptPubKey),
                              expected_scriptPubKey_hexbytes)
 
-        T('31h1vYVSYuKP6AhS86fbRdMw9XHieotbST',
+        T('r6Eb8FN9d1Xtmt1ZzBdtAJCynYS5jpWCRq',
           'a914000000000000000000000000000000000000000087')
 
-        T('1111111111111111111114oLvT2',
+        T('R9HC5WtHbpoa51NCUAz86XLCmGTbkf45NT',
           '76a914000000000000000000000000000000000000000088ac')
 
-        T('bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
-          '76a914751e76e8199196d454941c45d1b3a323f1433bd688ac')
+#        T('bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
+#          '76a914751e76e8199196d454941c45d1b3a323f1433bd688ac')
 
     def test_to_scriptPubKey(self):
         """CRavencoinAddress.to_scriptPubKey() works"""
@@ -143,10 +143,10 @@ class Test_CRavencoinAddress(unittest.TestCase):
             actual_scriptPubKey = addr.to_scriptPubKey()
             self.assertEqual(b2x(actual_scriptPubKey), expected_scriptPubKey_hexbytes)
 
-        T('31h1vYVSYuKP6AhS86fbRdMw9XHieotbST',
+        T('r6Eb8FN9d1Xtmt1ZzBdtAJCynYS5jpWCRq',
           'a914000000000000000000000000000000000000000087')
 
-        T('1111111111111111111114oLvT2',
+        T('R9HC5WtHbpoa51NCUAz86XLCmGTbkf45NT',
           '76a914000000000000000000000000000000000000000088ac')
 
 
@@ -156,9 +156,9 @@ class Test_P2SHRavencoinAddress(unittest.TestCase):
             addr = P2SHRavencoinAddress.from_redeemScript(script)
             self.assertEqual(str(addr), expected_str_address)
 
-        T(CScript(), '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy')
+        T(CScript(), 'rNgi5iPXJfKYt65YnocubTpm9swCcJwLTY')
         T(CScript(x('76a914751e76e8199196d454941c45d1b3a323f1433bd688ac')),
-          '3LRW7jeCvQCRdPF8S3yUCfRAx4eqXFmdcr')
+          'rQy5KSWuzWQwK6ZGJ8wkwLGDb5oCh5FXog')
 
 
 class Test_P2PKHRavencoinAddress(unittest.TestCase):
@@ -172,9 +172,9 @@ class Test_P2PKHRavencoinAddress(unittest.TestCase):
             with self.assertRaises(CRavencoinAddressError):
                 P2PKHRavencoinAddress.from_scriptPubKey(scriptPubKey, accept_non_canonical_pushdata=False)
 
-        T('76a94c14000000000000000000000000000000000000000088ac', '1111111111111111111114oLvT2')
-        T('76a94d1400000000000000000000000000000000000000000088ac', '1111111111111111111114oLvT2'),
-        T('76a94e14000000000000000000000000000000000000000000000088ac', '1111111111111111111114oLvT2')
+        T('76a94c14000000000000000000000000000000000000000088ac', 'R9HC5WtHbpoa51NCUAz86XLCmGTbkf45NT')
+        T('76a94d1400000000000000000000000000000000000000000088ac', 'R9HC5WtHbpoa51NCUAz86XLCmGTbkf45NT'),
+        T('76a94e14000000000000000000000000000000000000000000000088ac', 'R9HC5WtHbpoa51NCUAz86XLCmGTbkf45NT')
 
         # make sure invalid scripts raise CRavencoinAddressError
         with self.assertRaises(CRavencoinAddressError):
@@ -191,13 +191,13 @@ class Test_P2PKHRavencoinAddress(unittest.TestCase):
                 P2PKHRavencoinAddress.from_scriptPubKey(scriptPubKey, accept_bare_checksig=False)
 
         # compressed
-        T('21000000000000000000000000000000000000000000000000000000000000000000ac', '14p5cGy5DZmtNMQwTQiytBvxMVuTmFMSyU')
+        T('21000000000000000000000000000000000000000000000000000000000000000000ac', 'RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPVMY')
 
         # uncompressed
-        T('410000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ac', '1QLFaVVt99p1y18zWSZnespzhkFxjwBbdP')
+        T('410000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ac', 'RYcSf1PAjycb31WBycYukQACU1iZP3hLS7')
 
         # non-canonical encoding
-        T('4c21000000000000000000000000000000000000000000000000000000000000000000ac', '14p5cGy5DZmtNMQwTQiytBvxMVuTmFMSyU')
+        T('4c21000000000000000000000000000000000000000000000000000000000000000000ac', 'RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPVMY')
 
         # odd-lengths are *not* accepted
         with self.assertRaises(CRavencoinAddressError):
@@ -229,9 +229,9 @@ class Test_P2PKHRavencoinAddress(unittest.TestCase):
             self.assertEqual(str(addr), expected_str_addr)
 
         T(x(''),
-          '1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E')
+          'RRjK2yufHUbEBDSBGny9Xgwz8bxiWBC3m7')
         T(x('0378d430274f8c5ec1321338151e9f27f4c676a008bdf8638d07c0b6be9ab35c72'),
-          '1L9V4NXbNtZsLjrD3nkU7gtEYLWRBWXLiZ')
+          'RURg8tQsyiNSQkDQWxjbDDDSJby1qkt5cf')
 
         # With accept_invalid=False we should get CRavencoinAddressError's
         with self.assertRaises(CRavencoinAddressError):

@@ -14,6 +14,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import unittest
 
 from ravencoin.core import *
+from ravencoin.core.serialize import X16RHash,X16RV2Hash
 
 class Test_str_value(unittest.TestCase):
     def test(self):
@@ -56,7 +57,7 @@ class Test_CBlockHeader(unittest.TestCase):
                 nBits=0x1e00ffff,
                 nNonce=25023712)
         serialized = genesis.serialize()
-        self.assertEqual(Hash(serialized),
+        self.assertEqual(X16RHash(serialized),
                       lx('0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90'))
 
         genesis2 = CBlockHeader.deserialize(serialized)
@@ -89,8 +90,8 @@ class Test_CBlock(unittest.TestCase):
         initial_serialized = x('04000000000000000000000000000000000000000000000000000000000000000000000016355fae8b6a26f2fa708d39997654c44b501f308d802325359a7367a800ff28c60e4d5affff001ee0d47d010101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff570004ffff001d01044c4d5468652054696d65732030332f4a616e2f3230313820426974636f696e206973206e616d65206f66207468652067616d6520666f72206e65772067656e65726174696f6e206f66206669726d73ffffffff010088526a74000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000')
         genesis = CBlock.deserialize(initial_serialized)
         serialized = genesis.serialize()
-        self.assertEqual(Hash(serialized[0:80]),
-                      lx('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f'))
+        self.assertEqual(X16RHash(serialized[0:80]),
+                      lx('0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90'))
         self.assertEqual(serialized, initial_serialized)
 
     def test_GetHash(self):
