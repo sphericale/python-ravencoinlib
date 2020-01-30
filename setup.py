@@ -24,6 +24,8 @@ setup(name='python-ravencoinlib',
       keywords='ravencoin',
       packages=find_packages(),
       zip_safe=False,
+      author = 'standard-error@github',
+      author_email = 'ravencoinlib@gmail.com',
       install_requires=requires,
       test_suite="ravencoin.tests"
      )

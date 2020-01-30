@@ -25,7 +25,6 @@ thus better optimized but perhaps less stable.)
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import ssl
 
 try:
     import http.client as httplib
@@ -39,6 +38,7 @@ import os
 import platform
 import re
 import sys
+
 try:
     import urllib.parse as urlparse
 except ImportError:
@@ -63,22 +63,23 @@ if sys.version > '3':
 
 def get_rvn_datadir(datadir=None):
     if datadir is None:
-      if platform.system() == 'Darwin':
-          datadir = os.path.expanduser('~/Library/Application Support/Raven/')
-      elif platform.system() == 'Windows':
-          datadir = os.path.join(os.environ['APPDATA'], 'Raven')
-      else:
-          datadir = os.path.expanduser('~/.raven')
+        if platform.system() == 'Darwin':
+            datadir = os.path.expanduser('~/Library/Application Support/Raven/')
+        elif platform.system() == 'Windows':
+            datadir = os.path.join(os.environ['APPDATA'], 'Raven')
+        else:
+            datadir = os.path.expanduser('~/.raven')
 
     return datadir
 
+
 def get_rvn_conf(datadir=None):
-   return os.path.join(get_rvn_datadir(datadir), 'raven.conf')
+    return os.path.join(get_rvn_datadir(datadir), 'raven.conf')
+
 
 def check_numeric(num):
-   if not re.match('^[0-9\.]+$', str(num)):
-       raise(ValueError("'{}' is not numeric".format(num)))
-
+    if not re.match('^[0-9.]+$', str(num)):
+        raise (ValueError("'{}' is not numeric".format(num)))
 
 
 class JSONRPCError(Exception):
@@ -108,29 +109,36 @@ class JSONRPCError(Exception):
 
         return self
 
+
 @JSONRPCError._register_subcls
 class ForbiddenBySafeModeError(JSONRPCError):
     RPC_ERROR_CODE = -2
+
 
 @JSONRPCError._register_subcls
 class InvalidAddressOrKeyError(JSONRPCError):
     RPC_ERROR_CODE = -5
 
+
 @JSONRPCError._register_subcls
 class InvalidParameterError(JSONRPCError):
     RPC_ERROR_CODE = -8
+
 
 @JSONRPCError._register_subcls
 class VerifyError(JSONRPCError):
     RPC_ERROR_CODE = -25
 
+
 @JSONRPCError._register_subcls
 class VerifyRejectedError(JSONRPCError):
     RPC_ERROR_CODE = -26
 
+
 @JSONRPCError._register_subcls
 class VerifyAlreadyInChainError(JSONRPCError):
     RPC_ERROR_CODE = -27
+
 
 @JSONRPCError._register_subcls
 class InWarmupError(JSONRPCError):
@@ -189,7 +197,7 @@ class BaseProxy(object):
             conf['rpchost'] = conf.get('rpcconnect', 'localhost')
 
             service_url = ('%s://%s:%d' %
-                ('http', conf['rpchost'], conf['rpcport']))
+                           ('http', conf['rpchost'], conf['rpcport']))
 
             cookie_dir = conf.get('datadir', os.path.dirname(btc_conf_file))
             if ravencoin.params.NAME != "mainnet":
@@ -203,7 +211,9 @@ class BaseProxy(object):
                     authpair = "%s:%s" % (conf['rpcuser'], conf['rpcpassword'])
 
                 else:
-                    raise ValueError('Cookie file unusable (%s) and rpcpassword not specified in the configuration file: %r' % (err, btc_conf_file))
+                    raise ValueError(
+                        'Cookie file unusable (%s) and rpcpassword not specified in the configuration file: %r' % (
+                            err, btc_conf_file))
 
         else:
             url = urlparse.urlparse(service_url)
@@ -313,6 +323,7 @@ class RawProxy(BaseProxy):
     Python is concerned, you can call any method; ``JSONRPCError`` will be
     raised if the server does not recognize it.
     """
+
     def __init__(self,
                  service_url=None,
                  service_port=None,
@@ -423,7 +434,7 @@ class Proxy(BaseProxy):
         """
         r = self._call('generate', numblocks)
         return (lx(blk_hash) for blk_hash in r)
-    
+
     def generatetoaddress(self, numblocks, addr):
         """Mine blocks immediately (before the RPC call returns) and
         allocate block reward to passed address. Replaces deprecated 
@@ -456,7 +467,7 @@ class Proxy(BaseProxy):
         (default=False)
         """
         r = self._call('getbalance', account, minconf, include_watchonly)
-        return int(r*COIN)
+        return int(r * COIN)
 
     def getbestblockhash(self):
         """Return hash of best (tip) block in longest block chain."""
@@ -475,25 +486,24 @@ class Proxy(BaseProxy):
             block_hash = b2lx(block_hash)
         except TypeError:
             raise TypeError('%s.getblockheader(): block_hash must be bytes; got %r instance' %
-                    (self.__class__.__name__, block_hash.__class__))
+                            (self.__class__.__name__, block_hash.__class__))
         try:
             r = self._call('getblockheader', block_hash, verbose)
         except InvalidAddressOrKeyError as ex:
             raise IndexError('%s.getblockheader(): %s (%d)' %
-                    (self.__class__.__name__, ex.error['message'], ex.error['code']))
+                             (self.__class__.__name__, ex.error['message'], ex.error['code']))
 
         if verbose:
             nextblockhash = None
             if 'nextblockhash' in r:
                 nextblockhash = lx(r['nextblockhash'])
-            return {'confirmations':r['confirmations'],
-                    'height':r['height'],
-                    'mediantime':r['mediantime'],
-                    'nextblockhash':nextblockhash,
-                    'chainwork':x(r['chainwork'])}
+            return {'confirmations': r['confirmations'],
+                    'height': r['height'],
+                    'mediantime': r['mediantime'],
+                    'nextblockhash': nextblockhash,
+                    'chainwork': x(r['chainwork'])}
         else:
             return CBlockHeader.deserialize(unhexlify(r))
-
 
     def getblock(self, block_hash):
         """Get block <block_hash>
@@ -504,7 +514,7 @@ class Proxy(BaseProxy):
             block_hash = b2lx(block_hash)
         except TypeError:
             raise TypeError('%s.getblock(): block_hash must be bytes; got %r instance' %
-                    (self.__class__.__name__, block_hash.__class__))
+                            (self.__class__.__name__, block_hash.__class__))
         try:
             # With this change ( https://github.com/ravencoin/ravencoin/commit/96c850c20913b191cff9f66fedbb68812b1a41ea#diff-a0c8f511d90e83aa9b5857e819ced344 ),
             # ravencoin core's rpc takes 0/1/2 instead of true/false as the 2nd argument which specifies verbosity, since v0.15.0.
@@ -512,7 +522,7 @@ class Proxy(BaseProxy):
             r = self._call('getblock', block_hash, False)
         except InvalidAddressOrKeyError as ex:
             raise IndexError('%s.getblock(): %s (%d)' %
-                    (self.__class__.__name__, ex.error['message'], ex.error['code']))
+                             (self.__class__.__name__, ex.error['message'], ex.error['code']))
         return CBlock.deserialize(unhexlify(r))
 
     def getblockcount(self):
@@ -528,7 +538,7 @@ class Proxy(BaseProxy):
             return lx(self._call('getblockhash', height))
         except InvalidParameterError as ex:
             raise IndexError('%s.getblockhash(): %s (%d)' %
-                    (self.__class__.__name__, ex.error['message'], ex.error['code']))
+                             (self.__class__.__name__, ex.error['message'], ex.error['code']))
 
     def getinfo(self):
         """Return a JSON object containing various state info"""
@@ -590,7 +600,7 @@ class Proxy(BaseProxy):
             r = self._call('getrawtransaction', b2lx(txid), 1 if verbose else 0)
         except InvalidAddressOrKeyError as ex:
             raise IndexError('%s.getrawtransaction(): %s (%d)' %
-                    (self.__class__.__name__, ex.error['message'], ex.error['code']))
+                             (self.__class__.__name__, ex.error['message'], ex.error['code']))
         if verbose:
             r['tx'] = CTransaction.deserialize(unhexlify(r['hex']))
             del r['hex']
@@ -633,7 +643,7 @@ class Proxy(BaseProxy):
             r = self._call('gettransaction', b2lx(txid))
         except InvalidAddressOrKeyError as ex:
             raise IndexError('%s.getrawtransaction(): %s (%d)' %
-                    (self.__class__.__name__, ex.error['message'], ex.error['code']))
+                             (self.__class__.__name__, ex.error['message'], ex.error['code']))
         return r
 
     def gettxout(self, outpoint, includemempool=True):
@@ -696,7 +706,7 @@ class Proxy(BaseProxy):
 
     def lockunspent(self, unlock, outpoints):
         """Lock or unlock outpoints"""
-        json_outpoints = [{'txid':b2lx(outpoint.hash), 'vout':outpoint.n}
+        json_outpoints = [{'txid': b2lx(outpoint.hash), 'vout': outpoint.n}
                           for outpoint in outpoints]
         return self._call('lockunspent', unlock, json_outpoints)
 
@@ -713,12 +723,14 @@ class Proxy(BaseProxy):
             r = self._call('sendrawtransaction', hextx)
         return lx(r)
 
-    def sendmany(self, fromaccount, payments, minconf=1, comment='', subtractfeefromamount=[]):
+    def sendmany(self, fromaccount, payments, minconf=1, comment='', subtractfeefromamount=None):
         """Send amount to given addresses.
 
         payments - dict with {address: amount}
         """
-        json_payments = {str(addr):float(amount)/COIN
+        if subtractfeefromamount is None:
+            subtractfeefromamount = []
+        json_payments = {str(addr): float(amount) / COIN
                          for addr, amount in payments.items()}
         r = self._call('sendmany', fromaccount, json_payments, minconf, comment, subtractfeefromamount)
         return lx(r)
@@ -726,7 +738,7 @@ class Proxy(BaseProxy):
     def sendtoaddress(self, addr, amount, comment='', commentto='', subtractfeefromamount=False):
         """Send amount to a given address"""
         addr = str(addr)
-        amount = float(amount)/COIN
+        amount = float(amount) / COIN
         r = self._call('sendtoaddress', addr, amount, comment, commentto, subtractfeefromamount)
         return lx(r)
 
@@ -800,7 +812,7 @@ class Proxy(BaseProxy):
 
 
 class RavenRawProxy(RawProxy):
-   def __init__(self,
+    def __init__(self,
                  service_url=None,
                  service_port=None,
                  rvn_conf_file=None,
@@ -813,9 +825,10 @@ class RavenRawProxy(RawProxy):
                 rvn_conf_file = get_rvn_conf(datadir)
 
         super(RavenRawProxy, self).__init__(service_url=service_url,
-                                       service_port=service_port,
-                                       btc_conf_file=rvn_conf_file,
-                                       timeout=timeout)
+                                            service_port=service_port,
+                                            btc_conf_file=rvn_conf_file,
+                                            timeout=timeout)
+
 
 class RavenProxy(Proxy):
     def __init__(self,
@@ -831,19 +844,21 @@ class RavenProxy(Proxy):
                 rvn_conf_file = get_rvn_conf(datadir)
 
         super(RavenProxy, self).__init__(service_url=service_url,
-                                    service_port=service_port,
-                                    btc_conf_file=rvn_conf_file,
-                                    timeout=timeout)
+                                         service_port=service_port,
+                                         btc_conf_file=rvn_conf_file,
+                                         timeout=timeout)
 
     """ Raven asset support """
 
-    def issue(self, asset_name, qty=1, to_address="", change_address="", units=0, reissuable=True, has_ipfs=False, ipfs_hash=""):
+    def issue(self, asset_name, qty=1, to_address="", change_address="", units=0, reissuable=True, has_ipfs=False,
+              ipfs_hash=""):
         """Issue an asset with unique name.
         Unit as 0 for whole units, or 8 for satoshi-like units (0.00000001).
         Qty should be whole number.
         Reissuable is true/false for whether additional units can be issued by the original issuer."""
         check_numeric(qty)
-        r = self._call('issue', str(asset_name), qty, str(to_address), str(change_address), int(units), reissuable, has_ipfs, ipfs_hash)
+        r = self._call('issue', str(asset_name), qty, str(to_address), str(change_address), int(units), reissuable,
+                       has_ipfs, ipfs_hash)
         txid = r[0]
         return lx(txid)
 
@@ -856,15 +871,18 @@ class RavenProxy(Proxy):
         txid = r[0]
         return lx(txid)
 
-    def reissue(self, reissue_asset_name, qty, to_address, change_address="", reissuable=True, new_unit=-1, new_ipfs=None):
+    def reissue(self, reissue_asset_name, qty, to_address, change_address="", reissuable=True, new_unit=-1,
+                new_ipfs=None):
         """Issue more of a specific asset. This is only allowed by the original issuer of the asset
         and if the reissuable flag was set to true at the time of original issuance."""
         new_unit = int(new_unit)
         check_numeric(qty)
         if new_ipfs is not None:
-           r = self._call('reissue', str(reissue_asset_name), qty, str(to_address), str(change_address), reissuable, new_unit, new_ipfs)
+            r = self._call('reissue', str(reissue_asset_name), qty, str(to_address), str(change_address), reissuable,
+                           new_unit, new_ipfs)
         else:
-           r = self._call('reissue', str(reissue_asset_name), qty, str(to_address), str(change_address), reissuable, new_unit)
+            r = self._call('reissue', str(reissue_asset_name), qty, str(to_address), str(change_address), reissuable,
+                           new_unit)
         txid = r[0]
         return lx(txid)
 
@@ -900,6 +918,160 @@ class RavenProxy(Proxy):
         r = self._call('getassetdata', str(asset_name))
         return r
 
+    def transferfromaddress(self, asset_name, from_address, qty, to_address, message="",
+                            expire_time=0, rvn_change_address="", asset_change_address=""):
+        check_numeric(qty)
+        r = self._call('transferfromaddress', str(asset_name), str(from_address), qty, str(to_address),
+                       str(message), int(expire_time), str(rvn_change_address), str(asset_change_address))
+        return r
+
+    def transferfromaddresses(self, asset_name, from_addresses, qty, to_address, message="",
+                              expire_time=0, rvn_change_address="", asset_change_address=""):
+        check_numeric(qty)
+        r = self._call('transferfromaddresses', str(asset_name), str(from_addresses), qty, str(to_address),
+                       str(message),
+                       int(expire_time), str(rvn_change_address), str(asset_change_address))
+        return r
+
+    def getcacheinfo(self):
+        r = self._call('getcacheinfo')
+        return r
+
+    """ Restricted assets """
+
+    def addtagtoaddress(self, tag_name, to_address, change_address="", asset_data=""):
+        r = self._call('addtagtoaddress', str(tag_name), str(to_address), str(change_address), str(asset_data))
+        return r
+
+    def checkaddressrestriction(self, address, restricted_name):
+        r = self._call('checkaddressrestriction', str(address), str(restricted_name))
+        return r
+
+    def checkaddresstag(self, address, tag_name):
+        r = self._call('checkaddresstag', str(address), str(tag_name))
+        return r
+
+    def checkglobalrestriction(self, restricted_name):
+        r = self._call('checkglobalrestriction', str(restricted_name))
+        return r
+
+    def freezeaddress(self, asset_name, address, change_address="", asset_data=""):
+        r = self._call('freezeaddress', str(asset_name), str(address), str(change_address), str(asset_data))
+        return r
+
+    def freezerestrictedasset(self, asset_name, change_address, asset_data):
+        r = self._call('freezerestrictedasset', asset_name, change_address, asset_data)
+        return r
+
+    def getverifierstring(self, restricted_name):
+        r = self._call('getverifierstring', str(restricted_name))
+        return r
+
+    def issuequalifierasset(self, asset_name, qty, to_address, change_address, has_ipfs=False, ipfs_hash=""):
+        check_numeric(qty)
+        r = self._call('issuequalifierasset', str(asset_name), qty, str(to_address), str(change_address),
+                       bool(has_ipfs), str(ipfs_hash))
+        return r
+
+    def issuerestrictedasset(self, asset_name, qty, verifier, to_address, change_address, units=0, reissuable=True,
+                             has_ipfs=False, ipfs_hash=""):
+        check_numeric(qty)
+        r = self._call('issuerestrictedasset', str(asset_name), qty, str(verifier), str(to_address),
+                       str(change_address), int(units), bool(reissuable), bool(has_ipfs), str(ipfs_hash))
+        return r
+
+    def isvalidverifierstring(self, verifier_string):
+        r = self._call('isvalidverifierstring', str(verifier_string))
+        return r
+
+    def listaddressesfortag(self, tag_name):
+        r = self._call('listaddressesfortag', str(tag_name))
+        return r
+
+    def listaddressrestrictions(self, address):
+        r = self._call('listaddressrestrictions', str(address))
+        return r
+
+    def listglobalrestrictions(self):
+        r = self._call('listglobalrestrictions')
+        return r
+
+    def listtagsforaddress(self, address):
+        r = self._call('listtagsforaddress', str(address))
+        return r
+
+    def reissuerestrictedasset(self, asset_name, qty, to_address, change_verifier=False, new_verifier="",
+                               change_address="", new_units=-1, reissuable=True, new_ipfs=""):
+        check_numeric(qty)
+        r = self._call('reissuerestrictedasset', str(asset_name), qty, str(to_address), bool(change_verifier),
+                       str(new_verifier), str(change_address), int(new_units), bool(reissuable), str(new_ipfs))
+        return r
+
+    def removetagfromaddress(self, tag_name, to_address, change_address="", asset_data=""):
+        r = self._call('removetagfromaddress', str(tag_name), str(to_address), str(change_address), str(asset_data))
+        return r
+
+    def transferqualifier(self, qualifier_name, qty, to_address, change_address="", message="", expire_time=0):
+        check_numeric(qty)
+        r = self._call('transferqualifier', str(qualifier_name), qty, str(to_address), str(change_address),
+                       str(message), int(expire_time))
+        return r
+
+    def unfreezeaddress(self, asset_name, address, change_address="", asset_data=""):
+        r = self._call('unfreezeaddress', str(asset_name), str(address), str(change_address), str(asset_data))
+        return r
+
+    def unfreezerestrictedasset(self, asset_name, change_address="", asset_data=""):
+        r = self._call('unfreezerestrictedasset', str(asset_name), str(change_address), str(asset_data))
+        return r
+
+    def viewmyrestrictedaddresses(self):
+        r = self._call('viewmyrestrictedaddresses')
+        return r
+
+    def viewmytaggedaddresses(self):
+        r = self._call('viewmytaggedaddresses')
+        return r
+
+    """ Raven Rewards """
+
+    def getsnapshot(self, asset_name, block_height):
+        r = self._call('getsnapshot', str(asset_name), int(block_height))
+        return r
+
+    def purgesnapshot(self, asset_name, block_height):
+        r = self._call('purgesnapshot', str(asset_name), int(block_height))
+        return r
+
+    def cancelsnapshotrequest(self, asset_name, block_height):
+        r = self._call('cancelsnapshotrequest', str(asset_name), int(block_height))
+        return r
+
+    def distributereward(self, asset_name, snapshot_height, distribution_asset_name, gross_distribution_amount,
+                         exception_addresses, change_address, dry_run):
+        r = self._call('distributereward', str(asset_name), int(snapshot_height), str(distribution_asset_name),
+                       gross_distribution_amount,
+                       str(exception_addresses), str(change_address), bool(dry_run))
+        return r
+
+    def getdistributestatus(self, asset_name, snapshot_height, distribution_asset_name, gross_distribution_amount,
+                            exception_addresses):
+        r = self._call('getdistributestatus', str(asset_name), int(snapshot_height), str(distribution_asset_name),
+                       gross_distribution_amount, str(exception_addresses))
+        return r
+
+    def getsnapshotrequest(self, asset_name, block_height):
+        r = self._call('getsnapshotrequest', str(asset_name), int(block_height))
+        return r
+
+    def listsnapshotrequests(self, asset_name="", block_height=0):
+        r = self._call('listsnapshotrequests', str(asset_name), int(block_height))
+        return r
+
+    def requestsnapshot(self, asset_name, block_height):
+        r = self._call('requestsnapshot', str(asset_name), int(block_height))
+        return r
+
     """ Raven Messaging """
 
     def viewallmessages(self):
@@ -910,23 +1082,23 @@ class RavenProxy(Proxy):
         r = self._call('viewallmessagechannels')
         return r
 
-    def subscribetochannel(self,channel_name):
-    # subscribe to a messaging channel
-    # channel_name should be either an admin asset or channel name of form "ASSET~CHANNEL"
-    # (see CMessageChannel class in ravencoin.messaging)
-        r = self._call('subscribetochannel',str(channel_name))
+    def subscribetochannel(self, channel_name):
+        # subscribe to a messaging channel
+        # channel_name should be either an admin asset or channel name of form "ASSET~CHANNEL"
+        # (see CMessageChannel class in ravencoin.messaging)
+        r = self._call('subscribetochannel', str(channel_name))
         return r
 
-    def unsubscribefromchannel(self,channel_name):
-        r = self._call('unsubscribefromchannel',str(channel_name))
+    def unsubscribefromchannel(self, channel_name):
+        r = self._call('unsubscribefromchannel', str(channel_name))
         return r
 
     def clearmessages(self):
         r = self._call('clearmessages')
         return r
 
-    def sendmessage(self,channel_name,ipfs_hash,expire_time):
-        r = self._call('sendmessage',str(channel_name),ipfs_hash,expire_time)
+    def sendmessage(self, channel_name, ipfs_hash, expire_time=0):
+        r = self._call('sendmessage', str(channel_name), str(ipfs_hash), int(expire_time))
         return r
 
 

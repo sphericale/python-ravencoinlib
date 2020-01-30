@@ -12,11 +12,12 @@
 """Ravencoin assets"""
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import re
 
-MAX_NAME_LENGTH = 30 # +1 for admin
+MAX_NAME_LENGTH = 30  # +1 for admin
 
-sha_256_hash = re.compile("^[A-Fa-f0-9]{64}$") # regex matching a sha256 hash
+sha_256_hash = re.compile("^[A-Fa-f0-9]{64}$")  # regex matching a sha256 hash
 
 ROOT_NAME_CHARACTERS = re.compile(r"^[A-Z0-9._]{3,}$")
 SUB_NAME_CHARACTERS = re.compile(r"^[A-Z0-9._]+$")
@@ -30,37 +31,40 @@ TRAILING_PUNCTUATION = re.compile(r"^.*[._]$")
 
 RAVEN_NAMES = re.compile("^RVN$|^RAVEN$|^RAVENCOIN$")
 
+
 class InvalidAssetName(Exception):
     pass
 
+
 class InvalidAssetType(Exception):
     pass
+
 
 # Asset name representation
 # Types: CMainAsset, CSubAsset, CUniqueAsset
 # if admin == True, then this represents the admin token (ends with '!')
 
 class CAsset(object):
-# parent class for asset types
-# don't use this directly, use one of the subclasses instead
-    def __init__(self,name,parent=None,admin=False, *,ownership=None):
+    # parent class for asset types
+    # don't use this directly, use one of the subclasses instead
+    def __init__(self, name, parent=None, admin=False, *, ownership=None):
         if ownership is not None:
             # for backwards compatibility with < v0.2
             # ownership is alias for admin
             admin = ownership
         if type(admin) is not bool:
-           raise TypeError("CAsset __init__: admin={} must be of type bool".format(admin))
+            raise TypeError("CAsset __init__: admin={} must be of type bool".format(admin))
         self.admin = admin
         self.parent = parent
         self.name = name
 
     @property
     def full_name(self):
-        if isinstance(self,CMainAsset):
+        if isinstance(self, CMainAsset):
             return self._name
-        elif isinstance(self,CSubAsset):
+        elif isinstance(self, CSubAsset):
             return self.parent.full_name + '/' + self._name
-        elif isinstance(self,CUniqueAsset):
+        elif isinstance(self, CUniqueAsset):
             return self.parent.full_name + '#' + self._name
 
     def __str__(self):
@@ -71,8 +75,8 @@ class CAsset(object):
         return self._parent
 
     @parent.setter
-    def parent(self,parent):
-        if parent is not None and parent.admin == True:
+    def parent(self, parent):
+        if parent is not None and parent.admin is True:
             raise InvalidAssetType("Can't set admin token as parent")
         self._parent = parent
 
@@ -81,8 +85,8 @@ class CAsset(object):
         return self._name
 
     @name.setter
-    def name(self,namestr):
-    # check for invalid asset name
+    def name(self, namestr):
+        # check for invalid asset name
 
         if RAVEN_NAMES.match(namestr):
             raise InvalidAssetName("not allowed (RVN/RAVEN/RAVENCOIN")
@@ -92,50 +96,56 @@ class CAsset(object):
             raise InvalidAssetName("leading punctuation")
         if TRAILING_PUNCTUATION.match(namestr):
             raise InvalidAssetName("trailing punctuation")
-        if isinstance(self,CMainAsset) and not ROOT_NAME_CHARACTERS.match(namestr):
-            raise InvalidAssetName("\nInvalid characters in asset name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only, min length 3)".format(namestr))
-        elif isinstance(self,CSubAsset) and not SUB_NAME_CHARACTERS.match(namestr):
-            raise InvalidAssetName("\nInvalid characters in asset name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only".format(namestr))
-        elif isinstance(self,CUniqueAsset) and not UNIQUE_TAG_CHARACTERS.match(namestr):
-            raise InvalidAssetName("\nInvalid characters in asset name {}\n".format(namestr) + "'A-Z', 'a-z', '0-9' '-@$%&*()[]{}_.?:' allowed")
+        if isinstance(self, CMainAsset) and not ROOT_NAME_CHARACTERS.match(namestr):
+            raise InvalidAssetName(
+                "\nInvalid characters in asset name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only, min length 3)".format(
+                    namestr))
+        elif isinstance(self, CSubAsset) and not SUB_NAME_CHARACTERS.match(namestr):
+            raise InvalidAssetName(
+                "\nInvalid characters in asset name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only".format(
+                    namestr))
+        elif isinstance(self, CUniqueAsset) and not UNIQUE_TAG_CHARACTERS.match(namestr):
+            raise InvalidAssetName("\nInvalid characters in asset name {}\n".format(
+                namestr) + "'A-Z', 'a-z', '0-9' '-@$%&*()[]{}_.?:' allowed")
 
         max_length = MAX_NAME_LENGTH
         if self.admin:
             if not namestr.endswith('!'):
                 namestr = namestr + '!'
-            max_length+=1
+            max_length += 1
 
         self._name = namestr
 
         # unique tag '#' is not counted when checking length, as raven source
         if len(self.full_name.replace('#', '')) > max_length:
-            raise InvalidAssetName("Asset string {} is too long (max {} characters)".format(self.full_name,max_length))
-
+            raise InvalidAssetName("Asset string {} is too long (max {} characters)".format(self.full_name, max_length))
 
 
 class CMainAsset(CAsset):
-    def __init__(self,name,admin=False, *,ownership=None):
+    def __init__(self, name, admin=False, *, ownership=None):
         if ownership is not None:
             admin = ownership
-        super(CMainAsset, self).__init__(name,admin=admin)
+        super(CMainAsset, self).__init__(name, admin=admin)
+
 
 class CSubAsset(CAsset):
-    def __init__(self,name,parent=None,admin=False, *,ownership=None):
+    def __init__(self, name, parent=None, admin=False, *, ownership=None):
         if ownership is not None:
             admin = ownership
-        if parent == None:
+        if parent is None:
             raise InvalidAssetType("CSubAsset parent not provided")
         if isinstance(parent, CMainAsset) or isinstance(parent, CSubAsset):
-            super(CSubAsset, self).__init__(name,parent=parent,admin=admin)
+            super(CSubAsset, self).__init__(name, parent=parent, admin=admin)
         else:
             raise InvalidAssetType("CSubAsset requires parent of type CMainAsset or CSubAsset")
 
+
 class CUniqueAsset(CAsset):
-    def __init__(self,name,parent=None):
+    def __init__(self, name, parent=None):
         if parent == None:
             raise InvalidAssetType("CUniqueAsset parent not provided")
         if isinstance(parent, CMainAsset) or isinstance(parent, CSubAsset):
-            super(CUniqueAsset, self).__init__(name,parent=parent)
+            super(CUniqueAsset, self).__init__(name, parent=parent)
         else:
             raise InvalidAssetType("CUniqueAsset requires parent of type CMainAsset or CSubAsset")
 
@@ -148,11 +158,12 @@ class CUniqueAsset(CAsset):
 
 class Asset_Metadata(object):
     def __init__(self, contract_url="", contract_hash="", contract_signature="",
-                contract_address="", symbol="", name="", issuer="", description="", description_mime="",
-                type="", website_url="", icon="", image_url="", contact_name="", contact_email="",
-                contact_address="", contact_phone="", forsale=None, forsale_price="", forsale_price_currency="", restricted="", validate=True):
+                 contract_address="", symbol="", name="", issuer="", description="", description_mime="",
+                 type="", website_url="", icon="", image_url="", contact_name="", contact_email="",
+                 contact_address="", contact_phone="", forsale=None, forsale_price="", forsale_price_currency="",
+                 restricted="", validate=True):
 
-        self._validate = validate # if True, attempt to validate fields
+        self._validate = validate  # if True, attempt to validate fields
 
         self.contract_url = contract_url
         self.contract_hash = contract_hash
@@ -175,7 +186,7 @@ class Asset_Metadata(object):
         # currency and price can be given separately
         # otherwise assume forsale_price is already formatted e.g. "1000 USD" as spec
         if (forsale_price != "") and (forsale_price_currency != ""):
-            self.forsale_price = forsale_price+" "+forsale_price_currency
+            self.forsale_price = forsale_price + " " + forsale_price_currency
         else:
             self.forsale_price = forsale_price
         self.restricted = restricted
@@ -184,39 +195,38 @@ class Asset_Metadata(object):
         """ Returns json serializable string """
         import json
         return json.dumps(dict((key, value) for key, value in iter([
-              ("contract_url",self.contract_url),
-              ("contract_hash",self.contract_hash),
-              ("contract_signature",self.contract_signature),
-              ("contract_address",self.contract_address),
-              ("symbol",self.symbol),
-              ("name",self.name),
-              ("issuer",self.issuer),
-              ("description",self.description),
-              ("description_mime",self.description_mime),
-              ("type",self.type),
-              ("website_url",self.website_url),
-              ("icon",self.icon),
-              ("image_url",self.image_url),
-              ("contact_name",self.contact_name),
-              ("contact_email",self.contact_email),
-              ("contact_address",self.contact_address),
-              ("contact_phone",self.contact_phone),
-              ("forsale",self.forsale),
-              ("forsale_price",self.forsale_price),
-              ("restricted",self.restricted)
-              ]) if value is not None and value != ""))
+            ("contract_url", self.contract_url),
+            ("contract_hash", self.contract_hash),
+            ("contract_signature", self.contract_signature),
+            ("contract_address", self.contract_address),
+            ("symbol", self.symbol),
+            ("name", self.name),
+            ("issuer", self.issuer),
+            ("description", self.description),
+            ("description_mime", self.description_mime),
+            ("type", self.type),
+            ("website_url", self.website_url),
+            ("icon", self.icon),
+            ("image_url", self.image_url),
+            ("contact_name", self.contact_name),
+            ("contact_email", self.contact_email),
+            ("contact_address", self.contact_address),
+            ("contact_phone", self.contact_phone),
+            ("forsale", self.forsale),
+            ("forsale_price", self.forsale_price),
+            ("restricted", self.restricted)
+        ]) if value is not None and value != ""))
 
     @property
     def contract_hash(self):
         return self._contract_hash
 
     @contract_hash.setter
-    def contract_hash(self,hashstr):
+    def contract_hash(self, hashstr):
         if not self._validate or hashstr == "":
             self._contract_hash = hashstr
         else:
             if sha_256_hash.match(hashstr):
-               self._contract_hash = hashstr
+                self._contract_hash = hashstr
             else:
-               raise ValueError("contract_hash must be a sha256 hash in ascii hex")
-
+                raise ValueError("contract_hash must be a sha256 hash in ascii hex")
