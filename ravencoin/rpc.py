@@ -940,8 +940,12 @@ class RavenProxy(Proxy):
     """ Restricted assets """
 
     def addtagtoaddress(self, tag_name, to_address, change_address="", asset_data=""):
-        r = self._call('addtagtoaddress', str(tag_name), str(to_address), str(change_address), str(asset_data))
-        return r
+        if asset_data == "":
+           r = self._call('addtagtoaddress', str(tag_name), str(to_address), str(change_address))
+        else:
+           r = self._call('addtagtoaddress', str(tag_name), str(to_address), str(change_address), str(asset_data))
+        txid = r[0]
+        return lx(txid)
 
     def checkaddressrestriction(self, address, restricted_name):
         r = self._call('checkaddressrestriction', str(address), str(restricted_name))
@@ -956,29 +960,47 @@ class RavenProxy(Proxy):
         return r
 
     def freezeaddress(self, asset_name, address, change_address="", asset_data=""):
-        r = self._call('freezeaddress', str(asset_name), str(address), str(change_address), str(asset_data))
+        if asset_data == "":
+            r = self._call('freezeaddress', str(asset_name), str(address), str(change_address))
+        else:
+            r = self._call('freezeaddress', str(asset_name), str(address), str(change_address), str(asset_data))
         return r
 
-    def freezerestrictedasset(self, asset_name, change_address, asset_data):
-        r = self._call('freezerestrictedasset', asset_name, change_address, asset_data)
+    def freezerestrictedasset(self, asset_name, change_address="", asset_data=""):
+        if asset_data == "":
+            r = self._call('freezerestrictedasset', asset_name, change_address)
+        else:
+            r = self._call('freezerestrictedasset', asset_name, change_address, asset_data)
         return r
 
     def getverifierstring(self, restricted_name):
         r = self._call('getverifierstring', str(restricted_name))
         return r
 
-    def issuequalifierasset(self, asset_name, qty, to_address, change_address, has_ipfs=False, ipfs_hash=""):
+    def issuequalifierasset(self, asset_name, qty=1, to_address="", change_address="", has_ipfs=False, ipfs_hash=""):
         check_numeric(qty)
-        r = self._call('issuequalifierasset', str(asset_name), qty, str(to_address), str(change_address),
-                       bool(has_ipfs), str(ipfs_hash))
-        return r
+        has_ipfs = bool(has_ipfs)
+        if has_ipfs:
+            r = self._call('issuequalifierasset', str(asset_name), qty, str(to_address), str(change_address),
+                           has_ipfs, str(ipfs_hash))
+        else:
+            r = self._call('issuequalifierasset', str(asset_name), qty, str(to_address), str(change_address),
+                           has_ipfs)
+        txid = r[0]
+        return lx(txid)
 
-    def issuerestrictedasset(self, asset_name, qty, verifier, to_address, change_address, units=0, reissuable=True,
+    def issuerestrictedasset(self, asset_name, qty, verifier, to_address, change_address="", units=0, reissuable=True,
                              has_ipfs=False, ipfs_hash=""):
         check_numeric(qty)
-        r = self._call('issuerestrictedasset', str(asset_name), qty, str(verifier), str(to_address),
-                       str(change_address), int(units), bool(reissuable), bool(has_ipfs), str(ipfs_hash))
-        return r
+        has_ipfs = bool(has_ipfs)
+        if has_ipfs:
+            r = self._call('issuerestrictedasset', str(asset_name), qty, str(verifier), str(to_address),
+                           str(change_address), int(units), bool(reissuable), has_ipfs, str(ipfs_hash))
+        else:
+            r = self._call('issuerestrictedasset', str(asset_name), qty, str(verifier), str(to_address),
+                           str(change_address), int(units), bool(reissuable), has_ipfs)
+        txid = r[0]
+        return lx(txid)
 
     def isvalidverifierstring(self, verifier_string):
         r = self._call('isvalidverifierstring', str(verifier_string))
@@ -1008,7 +1030,10 @@ class RavenProxy(Proxy):
         return r
 
     def removetagfromaddress(self, tag_name, to_address, change_address="", asset_data=""):
-        r = self._call('removetagfromaddress', str(tag_name), str(to_address), str(change_address), str(asset_data))
+        if asset_data == "":
+            r = self._call('removetagfromaddress', str(tag_name), str(to_address), str(change_address))
+        else:
+            r = self._call('removetagfromaddress', str(tag_name), str(to_address), str(change_address), str(asset_data))
         return r
 
     def transferqualifier(self, qualifier_name, qty, to_address, change_address="", message="", expire_time=0):
@@ -1018,11 +1043,17 @@ class RavenProxy(Proxy):
         return r
 
     def unfreezeaddress(self, asset_name, address, change_address="", asset_data=""):
-        r = self._call('unfreezeaddress', str(asset_name), str(address), str(change_address), str(asset_data))
+        if asset_data == "":
+            r = self._call('unfreezeaddress', str(asset_name), str(address), str(change_address))
+        else:
+            r = self._call('unfreezeaddress', str(asset_name), str(address), str(change_address), str(asset_data))
         return r
 
     def unfreezerestrictedasset(self, asset_name, change_address="", asset_data=""):
-        r = self._call('unfreezerestrictedasset', str(asset_name), str(change_address), str(asset_data))
+        if asset_data == "":
+            r = self._call('unfreezerestrictedasset', str(asset_name), str(change_address))
+        else:
+            r = self._call('unfreezerestrictedasset', str(asset_name), str(change_address), str(asset_data))
         return r
 
     def viewmyrestrictedaddresses(self):
@@ -1048,14 +1079,14 @@ class RavenProxy(Proxy):
         return r
 
     def distributereward(self, asset_name, snapshot_height, distribution_asset_name, gross_distribution_amount,
-                         exception_addresses, change_address, dry_run):
+                         exception_addresses="", change_address="", dry_run=False):
         r = self._call('distributereward', str(asset_name), int(snapshot_height), str(distribution_asset_name),
                        gross_distribution_amount,
                        str(exception_addresses), str(change_address), bool(dry_run))
         return r
 
     def getdistributestatus(self, asset_name, snapshot_height, distribution_asset_name, gross_distribution_amount,
-                            exception_addresses):
+                            exception_addresses=""):
         r = self._call('getdistributestatus', str(asset_name), int(snapshot_height), str(distribution_asset_name),
                        gross_distribution_amount, str(exception_addresses))
         return r
