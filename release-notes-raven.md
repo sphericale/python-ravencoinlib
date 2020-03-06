@@ -1,5 +1,13 @@
 # python-ravencoinlib release notes
 
+## v0.2.2 - Mar 2020
+
+* Integrate bitcoin-blockchain-parser - scan Raven *.dat files without running ravend
+
+## v0.2.1 - Feb 2020
+
+* New class RvnAssetData for decoding OP_RVN_ASSET data structures
+
 ## v0.2 - Jan 2020
 
 New fork from python-bitcoinlib v0.10.2

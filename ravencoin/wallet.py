@@ -37,10 +37,10 @@ import ravencoin.core.script as script
 class CRavencoinAddress(object):
 
     def __new__(cls, s):
-        try:
-            return CBech32RavencoinAddress(s)
-        except ravencoin.bech32.Bech32Error:
-            pass
+#        try:
+#            return CBech32RavencoinAddress(s)
+#        except ravencoin.bech32.Bech32Error:
+#            pass
 
         try:
             return CBase58RavencoinAddress(s)
@@ -52,10 +52,10 @@ class CRavencoinAddress(object):
     @classmethod
     def from_scriptPubKey(cls, scriptPubKey):
         """Convert a scriptPubKey to a subclass of CRavencoinAddress"""
-        try:
-            return CBech32RavencoinAddress.from_scriptPubKey(scriptPubKey)
-        except CRavencoinAddressError:
-            pass
+#        try:
+#            return CBech32RavencoinAddress.from_scriptPubKey(scriptPubKey)
+#        except CRavencoinAddressError:
+#            pass
 
         try:
             return CBase58RavencoinAddress.from_scriptPubKey(scriptPubKey)

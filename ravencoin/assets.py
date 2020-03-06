@@ -25,6 +25,10 @@ UNIQUE_TAG_CHARACTERS = re.compile(r"^[-A-Za-z0-9@$%&*()[\]{}_.?:]+$")
 CHANNEL_TAG_CHARACTERS = re.compile(r"^[A-Z0-9._]+$")
 VOTE_TAG_CHARACTERS = re.compile(r"^[A-Z0-9._]+$")
 
+QUALIFIER_NAME_CHARACTERS = re.compile(r"^[A-Z0-9._]{3,}$")
+SUB_QUALIFIER_NAME_CHARACTERS = re.compile(r"^[A-Z0-9._]+$")
+RESTRICTED_NAME_CHARACTERS = re.compile(r"^[A-Z0-9._]{3,}$")
+
 DOUBLE_PUNCTUATION = re.compile(r"^.*[._]{2,}.*$")
 LEADING_PUNCTUATION = re.compile(r"^[._].*$")
 TRAILING_PUNCTUATION = re.compile(r"^.*[._]$")
@@ -62,10 +66,18 @@ class CAsset(object):
     def full_name(self):
         if isinstance(self, CMainAsset):
             return self._name
+        elif isinstance(self, CRestrictedAsset):
+            return "$" + self._name
         elif isinstance(self, CSubAsset):
             return self.parent.full_name + '/' + self._name
         elif isinstance(self, CUniqueAsset):
             return self.parent.full_name + '#' + self._name
+        elif isinstance(self, CSubQualifierTag):
+            return self.parent.full_name + '/#' + self._name
+        elif isinstance(self, CQualifierTag):
+            return '#' + self._name
+        else:
+            return self._name
 
     def __str__(self):
         return self.full_name
@@ -107,6 +119,14 @@ class CAsset(object):
         elif isinstance(self, CUniqueAsset) and not UNIQUE_TAG_CHARACTERS.match(namestr):
             raise InvalidAssetName("\nInvalid characters in asset name {}\n".format(
                 namestr) + "'A-Z', 'a-z', '0-9' '-@$%&*()[]{}_.?:' allowed")
+        if isinstance(self, CRestrictedAsset) and not RESTRICTED_NAME_CHARACTERS.match(namestr):
+            raise InvalidAssetName(
+                "\nInvalid characters in restricted asset name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only, min length 3)".format(
+                    namestr))
+        if isinstance(self, CQualifierTag) and not QUALIFIER_NAME_CHARACTERS.match(namestr):
+            raise InvalidAssetName(
+                "\nInvalid characters in qualifier name {}\n('A-Z', '0-9' '.' and '_' allowed, uppercase only, min length 3)".format(
+                    namestr))
 
         max_length = MAX_NAME_LENGTH
         if self.admin:
@@ -151,6 +171,95 @@ class CUniqueAsset(CAsset):
 
     def __str__(self):
         return self.name
+
+class CRestrictedAsset(CAsset):
+    def __init__(self, name, admin=False):
+        super(CRestrictedAsset, self).__init__(name, admin=admin)
+
+class CQualifierTag(CAsset):
+    def __init__(self, name, admin=False):
+        super(CQualifierTag, self).__init__(name, admin=admin)
+
+class CSubQualifierTag(CAsset):
+    def __init__(self, name,parent=None,admin=False):
+        if parent is None:
+            raise InvalidAssetType("CSubQualifier parent not provided")
+        if isinstance(parent, CQualifierTag):
+            super(CSubQualifierTag, self).__init__(name, parent=parent, admin=admin)
+        else:
+            raise InvalidAssetType("CSubQualifierTag requires parent of type CQualifierTag")
+
+
+def split_asset_name(s):
+    # split an asset string into list of parts
+
+    if s.startswith('$'): # restricted asset
+        return [CRestrictedAsset(s[1:])]
+
+    if s.startswith('#'): # qualifier tag
+        if s.count('#') == 1:
+            return [CQualifierTag(s[1:])]
+
+        result = []
+        prev = None
+        s = s.replace('/','/\xfa')
+        split_l = re.split('/',s)
+        for part in split_l:
+            if part.startswith('\xfa'):
+                a = CSubQualifierTag(part[2:], parent=prev)
+                result.append(a)
+                prev = a
+            else:
+                a = CQualifierTag(part[1:])
+                result.append(a)
+                prev = a
+        return result
+
+    s = s.replace('/','/\xfa') # hack, re.split excludes delimiter from results, so double it up with a placeholder
+    s = s.replace('#','#\xfb')
+    s = s.replace('~','~\xfc')
+    split_l = re.split('/|#|~',s)
+
+    result = []
+    prev = None
+    for part in split_l:
+        admin = part.endswith('!')
+        if admin:
+            part = part.rsplit('!')[0]
+        if part.startswith('\xfb'):
+            a = CUniqueAsset(part[1:], parent=prev)
+            result.append(a)
+            prev = a
+        elif part.startswith('\xfa'):
+            a = CSubAsset(part[1:], parent=prev, admin=admin)
+            result.append(a)
+            prev = a
+        elif part.startswith('\xfc'):
+            a = CMessageChannel(part[1:],parent=prev)
+            result.append(a)
+            prev = a
+        else:
+            a = CMainAsset(part, admin=admin)
+            result.append(a)
+            prev = a
+    return result
+
+
+class CAssetName(object):
+    def __init__(self,s=""):
+        self.parts = []
+
+        if len(s) < 3:
+            raise InvalidAssetName("Asset name {} is too short".format(s))
+
+        self.parts = split_asset_name(s)
+
+    def __str__(self):
+        if len(self.parts) > 0:
+            last = self.parts[-1]
+            return last.full_name
+        else:
+            return ""
 
 
 # Asset metadata representation
@@ -230,3 +339,47 @@ class Asset_Metadata(object):
                 self._contract_hash = hashstr
             else:
                 raise ValueError("contract_hash must be a sha256 hash in ascii hex")
+
+"""Ravencoin messaging"""
+
+MAX_CHANNEL_NAME_LENGTH = 12
+
+class InvalidChannelName(Exception):
+    pass
+
+class CMessageChannel(object):
+    def __init__(self,name,parent=None):
+        self.parent = parent
+        self.name = name
+
+    @property
+    def full_name(self):
+        return self.parent.full_name + '~' + self.name
+
+    def __str__(self):
+        return self.full_name
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self,namestr):
+    # check for invalid channel name
+        if len(namestr) > MAX_CHANNEL_NAME_LENGTH:
+            raise InvalidChannelName("Channel name {} is too long (max {} characters)".format(namestr,MAX_CHANNEL_NAME_LENGTH))
+        self._name = namestr
+    # check full name "ASSET~CHANNEL" as well
+        if len(str(self)) > MAX_NAME_LENGTH:
+            raise InvalidChannelName("Channel name {} is too long (max {} characters)".format(str(self),MAX_NAME_LENGTH))
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self,parent):
+        if parent is None or (not isinstance(parent, CMainAsset) and not isinstance(parent, CSubAsset)):
+            raise InvalidChannelName("Messaging channel requires parent of type CMainAsset or CSubAsset")
+        self._parent = parent
+

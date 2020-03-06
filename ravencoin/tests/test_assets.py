@@ -12,7 +12,8 @@
 import unittest
 
 import ravencoin
-from ravencoin.assets import CMainAsset, CSubAsset, CUniqueAsset, InvalidAssetName, InvalidAssetType
+from ravencoin.assets import CMainAsset, CSubAsset, CUniqueAsset, InvalidAssetName, InvalidAssetType, \
+                             CAssetName, CQualifierTag, CSubQualifierTag, CRestrictedAsset, CMessageChannel
 
 ravencoin.SelectParams("mainnet")
 
@@ -94,3 +95,32 @@ class Test_AssetNames(unittest.TestCase):
         with self.assertRaises(InvalidAssetType):
             CUniqueAsset("VALID",parent=admin_token)
         
+    def test_asset_names(self):
+        s = CAssetName("$TEST")
+        self.assertTrue(str(s) == "$TEST")
+        self.assertTrue(type(s.parts[0]) == CRestrictedAsset)
+
+        s = CAssetName("ONE/TWO/THREE#FOUR")
+        self.assertTrue(str(s) == "ONE/TWO/THREE#FOUR")
+        self.assertTrue(len(s.parts) == 4)
+        self.assertTrue(type(s.parts[0]) == CMainAsset)
+        self.assertTrue(type(s.parts[1]) == CSubAsset)
+        self.assertTrue(type(s.parts[2]) == CSubAsset)
+        self.assertTrue(type(s.parts[3]) == CUniqueAsset)
+
+        s = CAssetName("#FOUR")
+        self.assertTrue(str(s) == "#FOUR")
+        self.assertTrue(type(s.parts[0]) == CQualifierTag)
+
+        s = CAssetName("#FOUR/#FIVE")
+        self.assertTrue(str(s) == "#FOUR/#FIVE")
+        self.assertTrue(type(s.parts[0]) == CQualifierTag)
+        self.assertTrue(type(s.parts[1]) == CSubQualifierTag)
+
+        s = CAssetName("ONE~FIVE")
+        self.assertTrue(str(s) == "ONE~FIVE")
+        self.assertTrue(type(s.parts[0]) == CMainAsset)
+        self.assertTrue(type(s.parts[1]) == CMessageChannel)
+
+        with self.assertRaises(InvalidAssetName):
+            s = CAssetName("ONE/TWO/THREE/XXXXXXXXXXXXXXXXXX") # too long

@@ -12,8 +12,8 @@
 import unittest
 
 import ravencoin
-from ravencoin.assets import CMainAsset, CSubAsset, CUniqueAsset, InvalidAssetName, InvalidAssetType
-from ravencoin.messaging import CMessageChannel, InvalidChannelName
+from ravencoin.assets import CMainAsset, CSubAsset, CUniqueAsset, InvalidAssetName, InvalidAssetType, \
+                             CMessageChannel, InvalidChannelName
 
 ravencoin.SelectParams("mainnet")
 
