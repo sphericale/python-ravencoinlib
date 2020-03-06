@@ -10,18 +10,37 @@
 # propagated, or distributed except according to the terms contained in the
 # LICENSE file.
 
+import sys
+import argparse
 import ravencoin
 import ravencoin.core
 from ravencoin.rpc import RavenProxy
+from ravencoin.core import COIN
 from ravencoin.core.assets import RvnAssetData
 from ravencoin.core.script import OP_RVN_ASSET,CScriptOp
+from ravencoin.assets import CAssetName
 
-ravencoin.SelectParams("mainnet")
+parser = argparse.ArgumentParser(description='Scans Ravencoin blockchain for assets using RPC')
+parser.add_argument('--testnet',action="store_true",help="Use testnet (default: mainnet)")
+parser.add_argument('--startblock',type=int,default=0,help="Scan starting block")
+parser.add_argument('--match',type=str,default="",help="Asset name match string (default: all)")
+args=parser.parse_args()
+
+start = args.startblock
+if args.testnet:
+    ravencoin.SelectParams("testnet")
+else:
+    if args.startblock == 0:
+        start = ravencoin.core.coreparams.nAssetActivationHeight
+    ravencoin.SelectParams("mainnet")
 
 r = RavenProxy() # ravencoin daemon must be running locally with rpc server enabled
 
-start = ravencoin.core.coreparams.nAssetActivationHeight
-end = r.getblockcount()
+try:
+    end = r.getblockcount()
+except Exception as e:
+    print("Error: ".format(e))
+    sys.exit(1)
 
 for c in range(start,end):
    blockhash = r.getblockhash(c)
@@ -44,7 +63,13 @@ for c in range(start,end):
                    for d in data:
                       try:
                           a = RvnAssetData(d) # parse rvn asset data as python object
-                          print(a.asset_name,a.asset_type,int(a.amount/10e7))
+                          display = True
+                          if args.match != "" and not args.match in a.asset_name:
+                              display = False
+                          if display:
+                              print(a.asset_name,a.asset_type,int(a.amount/COIN),a.ipfshash)
+                          if a.asset_name != "":
+                              n = CAssetName(a.asset_name) # check asset name for validity
                       except Exception as e:
                           print(e,d)
 

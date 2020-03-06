@@ -65,7 +65,7 @@ class RvnAssetData(object):
         self._amount = 0
         self._divisor = None
         self._reissuable = None
-        self._ipfshash = None
+        self._ipfshash = ""
         self.data = None # raw data (bytes)
         isnull = False
 
@@ -100,21 +100,28 @@ class RvnAssetData(object):
 
             if self.asset_type in ("new","reissue"):
                 unpack_data = data[5 + name_length + 8:]
+                idx = 0
                 if len(unpack_data) > 0:
-                    self._divisor = struct.unpack('<B',unpack_data[0:1])[0]
+                    self._divisor = struct.unpack('<B',unpack_data[idx:idx+1])[0]
+                    idx += 1
                 if len(unpack_data) > 1:
-                    self._reissuable = struct.unpack('<B',unpack_data[1:2])[0]
-
-                if self.asset_type == "new":
-                    has_ipfs = struct.unpack('<?',unpack_data[2:3])[0]
-                    if has_ipfs:
-                        ipfs_bytelength = struct.unpack('<B',unpack_data[3:4])[0]
-                        self._ipfshash = struct.unpack('<{}s'.format(ipfs_bytelength), unpack_data[3:3+ipfs_bytelength])[0]
+                    self._reissuable = struct.unpack('<B',unpack_data[idx:idx+1])[0]
+                    idx += 1
+                if len(unpack_data) > 2 and self.asset_type == "new":
+                    has_ipfs = struct.unpack('<?',unpack_data[idx:idx+1])[0]
+                    idx += 1
+                if len(unpack_data) > 3:
+                    ipfs_bytelength = struct.unpack('<B',unpack_data[idx:idx+1])[0]
+                    if ipfs_bytelength == 84:
+                        idx += 1
+                        ipfs_bytelength = struct.unpack('<B',unpack_data[idx:idx+1])[0]
+                        idx += 1
+                    ipfs_data = unpack_data[idx:]
+                    self._ipfshash = struct.unpack('<{}s'.format(len(ipfs_data)), ipfs_data)[0]
+                    if len(self._ipfshash) == 34:
                         self._ipfshash = encode(self._ipfshash)
-                elif self.asset_type == "reissue" and len(unpack_data) > 2:
-                    ipfs_bytelength = struct.unpack('<B',unpack_data[2:3])[0]
-                    self._ipfshash = struct.unpack('<{}s'.format(ipfs_bytelength), unpack_data[3:3+ipfs_bytelength])[0]
-                    self._ipfshash = encode(self._ipfshash)
+                    else:
+                        self._ipfshash = self._ipfshash.hex()
 
     @property
     def asset_type(self):
@@ -129,6 +136,12 @@ class RvnAssetData(object):
     @property
     def asset_name(self):
         return self._asset_name
+
+    @asset_name.setter
+    def asset_name(self,s):
+        if type(s) != str:
+            raise ValueError("Asset name must be of type 'str'")
+        self._asset_name = s
 
     @property
     def amount(self):
