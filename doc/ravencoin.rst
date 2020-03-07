@@ -1,15 +1,25 @@
 ravencoin
-=======
+=========
 
 :mod:`ravencoin`
---------------
+----------------
 
 .. automodule:: ravencoin
+
+:mod:`assets`
+-------------
+
+.. automodule:: ravencoin.assets
 
 :mod:`base58`
 -------------
 
 .. automodule:: ravencoin.base58
+
+:mod:`blockchain`
+-----------------
+
+.. automodule:: ravencoin.blockchain
 
 :mod:`bloom`
 ------------

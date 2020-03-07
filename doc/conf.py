@@ -24,15 +24,11 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 
-from ravencoin import __version__
+from version import __version__
 
 # Prevent loading openssl when generating API docs. Either the whole library or
 # the necessary elliptic curve might not be available, causing import to fail.
-try:
-    from unittest.mock import MagicMock
-except ImportError:
-    from mock import MagicMock
-sys.modules['ctypes'] = MagicMock()
+autodoc_mock_imports = ["ctypes"]
 
 # -- General configuration -----------------------------------------------------
 

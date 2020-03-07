@@ -1,5 +1,5 @@
 ravencoin.core
-============
+==============
 
 Everything consensus critical is found in the core subpackage.
 
@@ -7,6 +7,11 @@ Everything consensus critical is found in the core subpackage.
 -----------
 
 .. automodule:: ravencoin.core
+
+:mod:`assets`
+-------------
+
+.. automodule:: ravencoin.core.assets
 
 :mod:`key`
 ----------

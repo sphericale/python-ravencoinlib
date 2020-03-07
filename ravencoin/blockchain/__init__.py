@@ -1,11 +1,12 @@
 # Copyright (C) 2015-2016 The bitcoin-blockchain-parser developers
+# Copyright (C) 2020 The ravencoin-blockchain-parser developers
 #
-# This file is part of bitcoin-blockchain-parser.
+# This file is part of ravencoin-blockchain-parser.
 #
 # It is subject to the license terms in the LICENSE file found in the top-level
 # directory of this distribution.
 #
-# No part of bitcoin-blockchain-parser, including this file, may be copied,
+# No part of ravencoin-blockchain-parser, including this file, may be copied,
 # modified, propagated, or distributed except according to the terms contained
 # in the LICENSE file.
 
@@ -28,7 +29,7 @@ RAVENCOIN_CONSTANT = b"\x52\x41\x56\x4e" # RAVN
 
 def get_files(path):
     """
-    Given the path to the .bitcoin directory, returns the sorted list of .blk
+    Given the path to the .raven directory, returns the sorted list of .blk
     files contained in that directory
     """
     if not stat.S_ISDIR(os.stat(path)[stat.ST_MODE]):
@@ -76,7 +77,7 @@ def get_block(blockfile, offset):
 
 class Blockchain(object):
     """Represent the blockchain contained in the series of .blk files
-    maintained by bitcoind.
+    maintained by ravend.
     """
 
     def __init__(self, path):
@@ -108,7 +109,7 @@ class Blockchain(object):
 
     def _index_confirmed(self, chain_indexes, num_confirmations=60):
         """Check if the first block index in "chain_indexes" has at least
-        "num_confirmation" (6) blocks built on top of it.
+        "num_confirmation" (60) blocks built on top of it.
         If it doesn't it is not confirmed and is an orphan.
         """
 
@@ -141,7 +142,7 @@ class Blockchain(object):
                 if chain[-1] == block.hashPrevBlock:
                     chain.append(block.GetHash())
 
-                # if we've found a chain length == num_dependencies (usually 6)
+                # if we've found a chain length == num_dependencies (usually 60)
                 # we are ready to make a decesion on whether or not the block
                 # belongs to a fork or the main chain
                 if len(chain) == num_confirmations:
@@ -153,7 +154,7 @@ class Blockchain(object):
     def get_ordered_blocks(self, index, start=0, end=None, cache=None):
         """Yields the blocks contained in the .blk files as per
         the heigt extract from the leveldb index present at path
-        index maintained by bitcoind.
+        index maintained by ravend.
         """
 
         blockIndexes = None
@@ -175,11 +176,11 @@ class Blockchain(object):
         # Occassionally a node will receive two different solutions to a block
         # at the same time. The Leveldb index saves both, not pruning the
         # block that leads to a shorter chain once the fork is settled without
-        # "-reindex"ing the bitcoind block data. This leads to at least two
+        # "-reindex"ing the ravend block data. This leads to at least two
         # blocks with the same height in the database.
-        # We throw out blocks that don't have at least 6 other blocks on top of
-        # it (6 confirmations).
-        orphans = []  # hold blocks that are orphans with < 6 blocks on top
+        # We throw out blocks that don't have at least 60 other blocks on top of
+        # it (60 confirmations).
+        orphans = []  # hold blocks that are orphans with < 60 blocks on top
         last_height = -1
         for i, blockIdx in enumerate(blockIndexes):
             if last_height > -1:
@@ -187,7 +188,7 @@ class Blockchain(object):
                 # occurred, now we have to figure out which of the two to keep
                 if blockIdx.height == last_height:
 
-                    # loop through future blocks until we find a chain 6 blocks
+                    # loop through future blocks until we find a chain 60 blocks
                     # long that includes this block. If we can't find one
                     # remove this block as it is invalid
                     if self._index_confirmed(blockIndexes[i:]):

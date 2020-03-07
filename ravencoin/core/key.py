@@ -16,7 +16,7 @@ WARNING: This module does not mlock() secrets; your private keys may end up on
 disk in swap! Use with caution!
 """
 import ctypes
-import ctypes.util
+from ctypes.util import find_library
 import hashlib
 import sys
 from os import urandom
@@ -31,9 +31,9 @@ if sys.version > '3':
 
 import ravencoin.core.script
 
-_ssl = ctypes.cdll.LoadLibrary(ctypes.util.find_library('ssl') or 'libeay32')
+_ssl = ctypes.cdll.LoadLibrary(find_library('ssl') or 'libeay32')
 
-_libsecp256k1_path = ctypes.util.find_library('secp256k1')
+_libsecp256k1_path = find_library('secp256k1')
 _libsecp256k1_enable_signing = False
 _libsecp256k1_context = None
 _libsecp256k1 = None
