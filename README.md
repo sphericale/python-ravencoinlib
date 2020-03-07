@@ -13,6 +13,10 @@ The RPC interface, ravencoin.rpc, is designed to work with Ravencoin Core v3.3.0
     Debian/Ubuntu: sudo apt-get install libssl-dev
     Windows/other: https://wiki.openssl.org/index.php/Binaries 
 
+    Python modules:
+        x16r-hash and x16rv2-hash
+        plyvel (requires libleveldb - for parsing Raven core .dat files)
+
 ## Structure
 
 Everything consensus critical is found in the modules under ravencoin.core. This
@@ -21,6 +25,7 @@ consensus critical and non-consensus-critical.
 
     ravencoin.core            - Basic core definitions, datastructures, and
                               (context-independent) validation
+    ravencoin.core.assets     - OP_RVN_ASSET data structures
     ravencoin.core.key        - ECC pubkeys
     ravencoin.core.script     - Scripts and opcodes
     ravencoin.core.scripteval - Script evaluation/verification
@@ -30,6 +35,7 @@ In the future the ravencoin.core may use the Satoshi sourcecode directly as a
 library. Non-consensus critical modules include the following:
 
     ravencoin          - Chain selection
+    ravencoin.assets   - Asset name and metadata related code
     ravencoin.base58   - Base58 encoding
     ravencoin.bloom    - Bloom filters (incomplete)
     ravencoin.net      - Network communication (in flux)
