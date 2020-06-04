@@ -1,5 +1,8 @@
 # python-ravencoinlib release notes
 
+## v0.2.3 - Jun 2020
+* Kawpow algo support
+
 ## v0.2.2 - Mar 2020
 
 * Integrate bitcoin-blockchain-parser - scan Raven *.dat files without running ravend

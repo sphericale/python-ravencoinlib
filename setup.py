@@ -9,7 +9,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'README.md')) as f:
     README = f.read()
 
-requires = ['x16r_hash','x16rv2_hash']
+requires = ['x16r_hash','x16rv2_hash','kawpow']
 
 setup(name='python-ravencoinlib',
       version=__version__,

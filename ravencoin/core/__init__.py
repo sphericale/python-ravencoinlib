@@ -520,9 +520,9 @@ class CMutableTransaction(CTransaction):
 
 class CBlockHeader(ImmutableSerializable):
     """A block header"""
-    __slots__ = ['nVersion', 'hashPrevBlock', 'hashMerkleRoot', 'nTime', 'nBits', 'nNonce']
+    __slots__ = ['nVersion', 'hashPrevBlock', 'hashMerkleRoot', 'nTime', 'nBits', 'nNonce', 'nHeight', 'nonce64', 'mix_hash']
 
-    def __init__(self, nVersion=2, hashPrevBlock=b'\x00'*32, hashMerkleRoot=b'\x00'*32, nTime=0, nBits=0, nNonce=0):
+    def __init__(self, nVersion=2, hashPrevBlock=b'\x00'*32, hashMerkleRoot=b'\x00'*32, nTime=0, nBits=0, nNonce=0, nHeight=0, nonce64=0, mix_hash=b''):
         object.__setattr__(self, 'nVersion', nVersion)
         assert len(hashPrevBlock) == 32
         object.__setattr__(self, 'hashPrevBlock', hashPrevBlock)
@@ -531,6 +531,9 @@ class CBlockHeader(ImmutableSerializable):
         object.__setattr__(self, 'nTime', nTime)
         object.__setattr__(self, 'nBits', nBits)
         object.__setattr__(self, 'nNonce', nNonce)
+        object.__setattr__(self, 'nHeight', nHeight)
+        object.__setattr__(self, 'nonce64', nonce64)
+        object.__setattr__(self, 'mix_hash', mix_hash)
 
     @classmethod
     def stream_deserialize(cls, f):
@@ -539,8 +542,16 @@ class CBlockHeader(ImmutableSerializable):
         hashMerkleRoot = ser_read(f,32)
         nTime = struct.unpack(b"<I", ser_read(f,4))[0]
         nBits = struct.unpack(b"<I", ser_read(f,4))[0]
-        nNonce = struct.unpack(b"<I", ser_read(f,4))[0]
-        return cls(nVersion, hashPrevBlock, hashMerkleRoot, nTime, nBits, nNonce)
+        # FIXME this only works on mainnet, but we have no information on network and nVersion is unchanged...
+        if nTime > 1588788000: # new header format
+            nHeight = struct.unpack(b"<I", ser_read(f,4))[0]
+            nonce64 = struct.unpack(b"<Q", ser_read(f,8))[0]
+            mix_hash = ser_read(f,32)
+            return cls(nVersion=nVersion, hashPrevBlock=hashPrevBlock, hashMerkleRoot=hashMerkleRoot, nTime=nTime, nBits=nBits, nNonce=0, \
+                       nHeight=nHeight, nonce64=nonce64, mix_hash=mix_hash)
+        else:
+            nNonce = struct.unpack(b"<I", ser_read(f,4))[0]
+            return cls(nVersion, hashPrevBlock, hashMerkleRoot, nTime, nBits, nNonce)
 
     def stream_serialize(self, f):
         f.write(struct.pack(b"<i", self.nVersion))
@@ -550,7 +561,12 @@ class CBlockHeader(ImmutableSerializable):
         f.write(self.hashMerkleRoot)
         f.write(struct.pack(b"<I", self.nTime))
         f.write(struct.pack(b"<I", self.nBits))
-        f.write(struct.pack(b"<I", self.nNonce))
+        if self.nTime > 1588788000: # new header format
+            f.write(struct.pack(b"<I", self.nHeight))
+            f.write(struct.pack(b"<Q", self.nonce64))
+            f.write(self.mix_hash)
+        else:
+            f.write(struct.pack(b"<I", self.nNonce))
 
     @staticmethod
     def calc_difficulty(nBits):
@@ -573,7 +589,9 @@ class CBlockHeader(ImmutableSerializable):
 
     def GetHash(self):
         global coreparams
-        if self.nTime >= coreparams.nX16RV2ActivationTime:
+        if self.nTime >= coreparams.nKAWPOWActivationTime:
+           return KawpowHash(self.serialize())
+        elif self.nTime >= coreparams.nX16RV2ActivationTime:
            return X16RV2Hash(self.serialize())
         else:
            return X16RHash(self.serialize())
@@ -672,7 +690,7 @@ class CBlock(CBlockHeader):
             raise ValueError('The witness commitment is missed')
         return commit_pos
 
-    def __init__(self, nVersion=2, hashPrevBlock=b'\x00'*32, hashMerkleRoot=b'\x00'*32, nTime=0, nBits=0, nNonce=0, vtx=()):
+    def __init__(self, nVersion=2, hashPrevBlock=b'\x00'*32, hashMerkleRoot=b'\x00'*32, nTime=0, nBits=0, nNonce=0, vtx=(), nHeight=0, nonce64=0, mix_hash=b''):
         """Create a new block"""
         if vtx:
             vMerkleTree = tuple(CBlock.build_merkle_tree_from_txs(vtx))
@@ -682,7 +700,7 @@ class CBlock(CBlockHeader):
                 raise CheckBlockError("CBlock : hashMerkleRoot is not compatible with vtx")
         else:
             vMerkleTree = ()
-        super(CBlock, self).__init__(nVersion, hashPrevBlock, hashMerkleRoot, nTime, nBits, nNonce)
+        super(CBlock, self).__init__(nVersion, hashPrevBlock, hashMerkleRoot, nTime, nBits, nNonce, nHeight, nonce64, mix_hash)
 
         object.__setattr__(self, 'vMerkleTree', vMerkleTree)
         try:
@@ -722,7 +740,10 @@ class CBlock(CBlockHeader):
                             hashMerkleRoot=self.hashMerkleRoot,
                             nTime=self.nTime,
                             nBits=self.nBits,
-                            nNonce=self.nNonce)
+                            nNonce=self.nNonce,
+                            nHeight=self.nHeight,
+                            nonce64=self.nonce64,
+                            mix_hash=self.mix_hash)
 
     def GetHash(self):
         """Return the block hash
@@ -758,11 +779,13 @@ class CoreMainParams(CoreChainParams):
     nDGWActivationBlock = 338778
     nAssetActivationHeight = 435456
     nX16RV2ActivationTime = 1569945600
+    nKAWPOWActivationTime = 1588788000
 
 class CoreTestNetParams(CoreMainParams):
     NAME = 'testnet'
     GENESIS_BLOCK = CBlock.deserialize(x('02000000000000000000000000000000000000000000000000000000000000000000000016355fae8b6a26f2fa708d39997654c44b501f308d802325359a7367a800ff2820e0a35bffff001e8847ee000101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff570004ffff001d01044c4d5468652054696d65732030332f4a616e2f3230313820426974636f696e206973206e616d65206f66207468652067616d6520666f72206e65772067656e65726174696f6e206f66206669726d73ffffffff010088526a74000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000'))
     nX16RV2ActivationTime = 1569931200
+    nKAWPOWActivationTime = 1585159200
 
 class CoreRegTestParams(CoreTestNetParams):
     NAME = 'regtest'

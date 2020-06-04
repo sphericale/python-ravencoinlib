@@ -1,2 +1,3 @@
 x16r-hash
 x16rv2-hash
+kawpow
