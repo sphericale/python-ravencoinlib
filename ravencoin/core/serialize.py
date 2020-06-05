@@ -19,6 +19,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import hashlib
 import x16r_hash
 import x16rv2_hash
+import kawpow
 import struct
 
 # Py3 compatibility
@@ -36,15 +37,28 @@ else:
 MAX_SIZE = 0x02000000
 
 
+def Hash(msg):
+    """SHA256^2)(msg) -> bytes"""
+    return hashlib.sha256(hashlib.sha256(msg).digest()).digest()
+
 def X16RHash(msg):
     return x16r_hash.getPoWHash(msg)
 
 def X16RV2Hash(msg):
     return x16rv2_hash.getPoWHash(msg)
 
-def Hash(msg):
-    """SHA256^2)(msg) -> bytes"""
-    return hashlib.sha256(hashlib.sha256(msg).digest()).digest()
+def KawpowHash(msg):
+
+    def revb(data):
+        b = bytearray(data)
+        b.reverse()
+        return bytes(b)
+
+    header_hash = revb(Hash(msg[:80]))
+    mix_hash = revb(msg[88:120])
+    nNonce64 = struct.unpack("< Q",msg[80:88])[0]
+    result = revb(kawpow.light_verify(header_hash, mix_hash, nNonce64))
+    return result
 
 def Hash160(msg):
     """RIPEME160(SHA256(msg)) -> bytes"""
@@ -369,6 +383,7 @@ __all__ = (
         'Hash',
         'X16RHash',
         'X16RV2Hash',
+        'KawpowHash',
         'Hash160',
         'SerializationError',
         'SerializationTruncationError',
