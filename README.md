@@ -14,7 +14,7 @@ The RPC interface, ravencoin.rpc, is designed to work with Ravencoin Core v3.3.0
     Windows/other: https://wiki.openssl.org/index.php/Binaries 
 
     Python modules:
-        x16r-hash and x16rv2-hash
+        x16r-hash, x16rv2-hash and kawpow
         plyvel (requires libleveldb - for parsing Raven core .dat files)
 
 ## Structure
